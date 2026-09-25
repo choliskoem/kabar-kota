@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { resolveCoverImage } from "@/lib/cover-image";
 import type { ArticleSummary } from "@/types/domain";
 import { LeadReveal } from "@/components/motion/LeadReveal";
 import { CategoryLabel } from "./CategoryLabel";
@@ -9,16 +10,17 @@ import styles from "./news.module.css";
 
 /** Berita utama sebagai poster: foto besar dengan blok warna kategori berisi judul. */
 export function PosterStory({ article }: { article: ArticleSummary }) {
+  const hasImage = resolveCoverImage(article, "large") !== null;
+
   return (
     <LeadReveal
-      className={`${styles.poster} ${article.cover ? "" : styles.posterNoImage}`}
+      className={`${styles.poster} ${hasImage ? "" : styles.posterNoImage}`}
       style={routeStyle(article.category.color)}
     >
-      {article.cover && (
+      {hasImage && (
         <div className={styles.posterMedia}>
           <NewsImage
-            media={article.cover}
-            category={article.category}
+            article={article}
             variant="large"
             sizes="(max-width: 900px) 100vw, 1240px"
             priority

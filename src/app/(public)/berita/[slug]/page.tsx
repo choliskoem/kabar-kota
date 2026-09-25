@@ -9,7 +9,7 @@ import { NewsImage } from "@/components/news/NewsImage";
 import { StoryItem } from "@/components/news/StoryItem";
 import { routeStyle } from "@/components/news/route-style";
 import { formatDate, formatReadingTime, formatTime, splitParagraphs } from "@/lib/format";
-import { publicImageUrl } from "@/lib/media-url";
+import { resolveCoverImage } from "@/lib/cover-image";
 import {
   getArticlesByCategory,
   getPublishedArticleBySlug,
@@ -35,6 +35,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
   const article = await getPublishedArticleBySlug((await params).slug);
   if (!article) return {};
+  const cover = resolveCoverImage(article, "large");
 
   return {
     title: article.title,
@@ -44,7 +45,7 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
       description: article.excerpt,
       type: "article",
       publishedTime: article.publishedAt ?? undefined,
-      images: article.cover ? [publicImageUrl(article.cover.storagePath)] : undefined,
+      images: cover ? [cover.src] : undefined,
     },
   };
 }
@@ -57,6 +58,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
     .filter(({ id }) => id !== article.id)
     .slice(0, RELATED_COUNT);
   const path = `/berita/${article.slug}`;
+  const cover = resolveCoverImage(article, "large");
   const paragraphs = splitParagraphs(article.body);
   // Urutan ini harus sama dengan data-speech-index di bawah: judul, ringkasan, lalu paragraf.
   const speechSegments = [article.title, article.excerpt, ...paragraphs];
@@ -86,21 +88,20 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           </div>
         </header>
 
-        {article.cover && (
+        {cover && (
           <figure className={styles.figure}>
             <div className={styles.figureMedia}>
               <NewsImage
-                media={article.cover}
-                category={article.category}
+                article={article}
                 variant="large"
                 sizes="(max-width: 1280px) 100vw, 1240px"
                 priority
               />
             </div>
-            {(article.cover.caption || article.cover.credit) && (
+            {(cover.caption || cover.credit) && (
               <figcaption>
-                {article.cover.caption && <span>{article.cover.caption}</span>}
-                {article.cover.credit && <span>Foto: {article.cover.credit}</span>}
+                {cover.caption && <span>{cover.caption}</span>}
+                {cover.credit && <span>Foto: {cover.credit}</span>}
               </figcaption>
             )}
           </figure>

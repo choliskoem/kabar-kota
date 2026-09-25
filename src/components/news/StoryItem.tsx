@@ -9,8 +9,7 @@ export function StoryItem({ article }: { article: ArticleSummary }) {
     <article className={styles.story}>
       <div className={styles.storyMedia}>
         <NewsImage
-          media={article.cover}
-          category={article.category}
+          article={article}
           variant="thumb"
           sizes="(max-width: 700px) 80vw, 33vw"
           fill
