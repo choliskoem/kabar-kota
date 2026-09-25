@@ -1,0 +1,128 @@
+/* ---------- Token desain ---------- */
+:root {
+  --paper: #edf1f5;
+  --surface: #ffffff;
+  --ink: #1a2233;
+  --muted: #56617a;
+  --line: #d3dae4;
+  --signal: #e8a200;
+  --danger: #c92a2a;
+  --success: #0e9f6e;
+
+  --font-display: var(--font-bricolage), "Arial Narrow", system-ui, sans-serif;
+  --font-body: var(--font-source-serif), Georgia, "Times New Roman", serif;
+
+  --step--1: 0.875rem;
+  --step-0: 1rem;
+  --step-1: 1.25rem;
+  --step-2: 1.563rem;
+  --step-3: clamp(1.75rem, 1.4rem + 1.4vw, 2.441rem);
+  --step-4: clamp(2.3rem, 1.6rem + 3.2vw, 4.4rem);
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 1rem;
+  --space-4: 1.5rem;
+  --space-5: 2.5rem;
+  --space-6: 4rem;
+
+  --route-width: 10px;
+  --page-width: 1200px;
+  --gutter: clamp(1rem, 4vw, 2.5rem);
+  --radius: 6px;
+
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #121826;
+    --surface: #1a2233;
+    --ink: #edf1f7;
+    --muted: #9aa5b8;
+    --line: #2b3548;
+  }
+}
+
+/* ---------- Dasar ---------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--step-0);
+  line-height: 1.6;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+  margin: 0;
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+:focus-visible {
+  outline: 3px solid var(--signal);
+  outline-offset: 3px;
+}
+
+.page {
+  width: min(100% - 2 * var(--gutter), var(--page-width));
+  margin-inline: auto;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Lenis */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

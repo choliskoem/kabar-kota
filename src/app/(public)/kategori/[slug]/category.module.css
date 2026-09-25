@@ -1,0 +1,19 @@
+.page {
+  display: grid;
+  gap: var(--space-5);
+  padding-block: var(--space-5);
+}
+
+.title {
+  padding-bottom: var(--space-3);
+  border-bottom: var(--route-width) solid var(--route);
+  font-size: var(--step-4);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: var(--space-5) var(--space-4);
+}
