@@ -44,14 +44,12 @@ export async function changeStatusAction(articleId: string, status: ArticleStatu
 
   await changeArticleStatus(articleId, nextStatus);
   revalidateNewsPages();
-  revalidatePath("/dashboard");
 }
 
 export async function deleteArticleAction(articleId: string): Promise<void> {
   await requireStaff();
   await deleteArticle(articleId);
   revalidateNewsPages();
-  revalidatePath("/dashboard");
 }
 
 export async function signOutAction(): Promise<void> {
@@ -60,10 +58,12 @@ export async function signOutAction(): Promise<void> {
   redirect("/masuk");
 }
 
-/** Halaman berita publik memakai ISR, jadi perlu disegarkan setelah ada perubahan. */
+/**
+ * Halaman publik (beranda, berita, kategori, tag) memakai ISR. Setelah ada perubahan,
+ * semua halaman di bawah layout akar ditandai usang agar langsung dibuat ulang.
+ * Catatan: pola seperti "/berita/[slug]" tidak cocok karena halaman berada di
+ * dalam route group (public); revalidasi layout akar mencakup semuanya.
+ */
 function revalidateNewsPages(): void {
-  revalidatePath("/");
-  revalidatePath("/berita/[slug]", "page");
-  revalidatePath("/kategori/[slug]", "page");
-  revalidatePath("/tag/[slug]", "page");
+  revalidatePath("/", "layout");
 }
