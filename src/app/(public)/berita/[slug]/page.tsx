@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { ListenToArticle } from "@/components/article/ListenToArticle";
 import { ReadingProgress } from "@/components/article/ReadingProgress";
 import { ShareButton } from "@/components/article/ShareButton";
 import { CategoryLabel } from "@/components/news/CategoryLabel";
@@ -56,6 +57,9 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
     .filter(({ id }) => id !== article.id)
     .slice(0, RELATED_COUNT);
   const path = `/berita/${article.slug}`;
+  const paragraphs = splitParagraphs(article.body);
+  // Urutan ini harus sama dengan data-speech-index di bawah: judul, ringkasan, lalu paragraf.
+  const speechSegments = [article.title, article.excerpt, ...paragraphs];
 
   return (
     <div style={routeStyle(article.category.color)}>
@@ -63,8 +67,12 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
       <article className={`page ${styles.article}`}>
         <header className={styles.header}>
           <CategoryLabel category={article.category} />
-          <h1 className={styles.title}>{article.title}</h1>
-          <p className={styles.excerpt}>{article.excerpt}</p>
+          <h1 className={styles.title} data-speech-index={0}>
+            {article.title}
+          </h1>
+          <p className={styles.excerpt} data-speech-index={1}>
+            {article.excerpt}
+          </p>
           <div className={styles.byline}>
             <span className={styles.author}>{article.authorName}</span>
             {article.publishedAt && (
@@ -73,6 +81,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
               </time>
             )}
             <span>{formatReadingTime(article.readingMinutes)}</span>
+            <ListenToArticle segments={speechSegments} />
             <ShareButton title={article.title} path={path} />
           </div>
         </header>
@@ -98,8 +107,10 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         )}
 
         <div className={styles.body}>
-          {splitParagraphs(article.body).map((paragraph, index) => (
-            <p key={index}>{paragraph}</p>
+          {paragraphs.map((paragraph, index) => (
+            <p key={index} data-speech-index={index + 2}>
+              {paragraph}
+            </p>
           ))}
         </div>
 
