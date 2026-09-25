@@ -1,16 +1,14 @@
 import Link from "next/link";
-import { siteConfig } from "@/lib/site";
 import type { Category } from "@/types/domain";
 import { routeStyle } from "@/components/news/route-style";
+import { Logo } from "./Logo";
 import styles from "./site.module.css";
 
 export function SiteHeader({ categories }: { categories: Category[] }) {
   return (
     <header className={styles.header}>
       <div className={`page ${styles.headerInner}`}>
-        <Link href="/" className={styles.wordmark}>
-          {siteConfig.name}
-        </Link>
+        <Logo categories={categories} />
         <nav aria-label="Kategori berita" className={styles.nav}>
           <ul>
             {categories.map((category) => (

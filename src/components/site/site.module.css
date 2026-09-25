@@ -15,21 +15,48 @@
 }
 
 /* Logo sebagai stiker kuning stabilo */
-.wordmark {
+/* Logo: stiker kuning stabilo dengan garis jalur kategori */
+.logo {
+  display: inline-grid;
   flex-shrink: 0;
-  padding: 0.2rem 0.75rem 0.3rem;
-  border: 2px solid var(--ink);
-  border-radius: var(--radius);
+  gap: 0.35rem;
+  padding: 0.4rem 0.95rem 0.55rem;
+  border: 3px solid var(--ink);
+  border-radius: 14px;
   background: var(--stabilo);
   color: #15182b;
-  box-shadow: var(--sticker-shadow);
+  box-shadow: 4px 4px 0 var(--ink);
+  text-decoration: none;
+  transform: rotate(-2.5deg);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.logo:hover {
+  box-shadow: 7px 7px 0 var(--ink);
+  transform: rotate(0deg) translate(-2px, -2px);
+}
+
+.logoText {
   font-family: var(--font-display);
-  font-size: var(--step-2);
+  font-size: clamp(1.75rem, 1.2rem + 1.8vw, 2.6rem);
   font-variation-settings: "wdth" 75;
   font-weight: 800;
-  line-height: 1.1;
-  text-decoration: none;
-  transform: rotate(-2deg);
+  line-height: 0.9;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.logoRoute {
+  display: flex;
+  height: 9px;
+  overflow: hidden;
+  border: 2px solid #15182b;
+  border-radius: 999px;
+}
+
+.logoRoute span {
+  flex: 1;
+  background: var(--route);
 }
 
 .nav {
@@ -129,10 +156,6 @@
     align-items: flex-start;
     gap: var(--space-2);
     padding-bottom: var(--space-2);
-  }
-
-  .wordmark {
-    font-size: var(--step-1);
   }
 
   .nav {

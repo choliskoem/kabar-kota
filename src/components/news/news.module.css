@@ -201,6 +201,28 @@
 }
 
 /* ---------- Jalur terkini ---------- */
+.lineScroller {
+  max-height: 26rem;
+  margin-right: calc(-1 * var(--space-2));
+  padding-right: var(--space-2);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+  /* Bagian bawah memudar sebagai tanda daftar masih bisa digulir */
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 3.5rem), transparent);
+}
+
+.lineScroller:focus-visible {
+  outline: 3px solid var(--stabilo);
+  outline-offset: 4px;
+  box-shadow: none;
+}
+
+.lineScroller .line {
+  padding-top: 0.2rem;
+  padding-bottom: 3.5rem;
+}
 .line {
   position: relative;
   display: grid;
@@ -397,5 +419,8 @@
 
   .panel {
     padding: var(--space-3);
+  }
+  .lineScroller {
+    max-height: 22rem;
   }
 }

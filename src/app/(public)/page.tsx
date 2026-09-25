@@ -9,7 +9,7 @@ import styles from "./home.module.css";
 
 export const revalidate = 60;
 
-const LATEST_COUNT = 5;
+const LATEST_COUNT = 10;
 const STORIES_PER_CATEGORY = 3;
 const TRENDING_COUNT = 10;
 
