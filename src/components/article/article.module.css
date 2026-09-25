@@ -100,16 +100,29 @@
 
 .body {
   display: grid;
-  gap: 1.25em;
+  gap: 1.4em;
   max-width: 38rem;
   font-size: 1.125rem;
-  line-height: 1.78;
+  line-height: 1.8;
+  overflow-wrap: break-word;
 }
 
+/* Paragraf pembuka sedikit lebih besar sebagai pengantar, tanpa menjadi tebal */
 .body p:first-child {
-  font-size: 1.25rem;
-  font-weight: 600;
-  line-height: 1.6;
+  font-size: 1.1875rem;
+  font-weight: 500;
+}
+
+@media (max-width: 600px) {
+  .body {
+    gap: 1.25em;
+    font-size: 1.0625rem;
+    line-height: 1.75;
+  }
+
+  .body p:first-child {
+    font-size: 1.125rem;
+  }
 }
 
 .tags {

@@ -21,9 +21,15 @@ export function formatTime(iso: string): string {
   return `${timeFormatter.format(new Date(iso))} WIB`;
 }
 
+/** Formulir browser mengirim baris baru sebagai \r\n; disamakan menjadi \n. */
+export function normalizeLineBreaks(text: string): string {
+  return text.replace(/\r\n?/g, "\n");
+}
+
+/** Setiap baris baru dianggap paragraf baru; baris kosong berlebih diabaikan. */
 export function splitParagraphs(text: string): string[] {
-  return text
-    .split(/\n{2,}/)
+  return normalizeLineBreaks(text)
+    .split("\n")
     .map((paragraph) => paragraph.trim())
     .filter(Boolean);
 }

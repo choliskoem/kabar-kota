@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { normalizeLineBreaks } from "@/lib/format";
 import type { ArticleFormState } from "@/validation/article-form-state";
 
 const MAX_TAGS = 8;
@@ -32,7 +33,7 @@ export const articleInputSchema = z.object({
     .trim()
     .min(20, "Ringkasan minimal 20 karakter.")
     .max(300, "Ringkasan maksimal 300 karakter."),
-  body: z.string().trim().min(50, "Isi berita minimal 50 karakter."),
+  body: z.string().trim().min(50, "Isi berita minimal 50 karakter.").transform(normalizeLineBreaks),
   categoryId: z.coerce.number().int().positive("Pilih kategori."),
   coverMediaId: z.preprocess(emptyToUndefined, z.uuid().optional()),
   tags: z

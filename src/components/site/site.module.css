@@ -6,7 +6,10 @@
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
-
+  /* Di HP header tidak ikut menempel supaya layar yang kecil dipakai untuk berita */
+  .header {
+    position: static;
+  }
 .headerInner {
   display: flex;
   align-items: center;

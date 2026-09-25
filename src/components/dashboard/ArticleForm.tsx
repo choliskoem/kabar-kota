@@ -66,7 +66,7 @@ function preventEnterSubmit(event: KeyboardEvent<HTMLFormElement>) {
 
 function bodyHint(body: string): string {
   const words = countWords(body);
-  const paragraphHint = "Pisahkan paragraf dengan satu baris kosong.";
+    const paragraphHint = "Tekan Enter untuk membuat paragraf baru.";
   if (words === 0) return paragraphHint;
   return `${words} kata, sekitar ${estimateReadingMinutes(body)} menit baca. ${paragraphHint}`;
 }
