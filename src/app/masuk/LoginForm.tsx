@@ -6,9 +6,9 @@ import styles from "./login.module.css";
 
 const initialState: LoginState = { message: null };
 
-export function LoginForm({ next, notice }: { next?: string; notice?: string }) {
+export function LoginForm({ next }: { next?: string }) {
   const [state, formAction, isPending] = useActionState(signInAction, initialState);
-  const message = state.message ?? notice;
+  const message = state.message;
 
   return (
     <form action={formAction} className={styles.form}>

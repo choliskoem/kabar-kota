@@ -24,9 +24,7 @@ export async function updateSession(request: NextRequest) {
     },
   });
 
-  const { data } = await supabase.auth.getClaims();
-  const isLoggedIn = Boolean(data?.claims);
-  const { pathname, search } = request.nextUrl;
+    const { pathname, search, searchParams } = request.nextUrl;
 
   if (!isLoggedIn && pathname.startsWith(PROTECTED_PREFIX)) {
     const loginUrl = new URL(LOGIN_PATH, request.url);
@@ -34,9 +32,13 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  if (isLoggedIn && pathname === LOGIN_PATH) {
+  // Jangan lempar balik ke dashboard kalau halaman masuk sedang menampilkan
+  // pesan (mis. akun belum punya akses), supaya tidak terjadi redirect berulang.
+  const hasLoginNotice = searchParams.has("error");
+  if (isLoggedIn && pathname === LOGIN_PATH && !hasLoginNotice) {
     return NextResponse.redirect(new URL(PROTECTED_PREFIX, request.url));
   }
 
   return response;
+}
 }
