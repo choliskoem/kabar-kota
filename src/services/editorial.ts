@@ -14,7 +14,20 @@ import type { ArticleInput } from "@/validation/article";
 
 type ServerSupabase = Awaited<ReturnType<typeof createServerSupabase>>;
 
-export async function getDashboardArticles(profile: Profile): Promise<ArticleSummary[]> {
+export interface DashboardFilter {
+  status?: ArticleStatus;
+  search?: string;
+}
+
+export type StatusCounts = Record<ArticleStatus, number>;
+
+const ARTICLE_STATUSES: ArticleStatus[] = ["draft", "review", "published"];
+
+/** Editor melihat semua berita; penulis hanya berita miliknya. */
+export async function getDashboardArticles(
+  profile: Profile,
+  filter: DashboardFilter = {},
+): Promise<ArticleSummary[]> {
   const supabase = await createServerSupabase();
   let query = supabase
     .from("articles")
@@ -23,10 +36,32 @@ export async function getDashboardArticles(profile: Profile): Promise<ArticleSum
     .limit(50);
 
   if (!canPublish(profile.role)) query = query.eq("author_id", profile.id);
+  if (filter.status) query = query.eq("status", filter.status);
+  if (filter.search) query = query.ilike("title", `%${escapeLikePattern(filter.search)}%`);
 
   const { data, error } = await query;
-  if (error) throw new Error(`Gagal memuat daftar artikel: ${error.message}`);
+  if (error) throw new Error(`Gagal memuat daftar berita: ${error.message}`);
   return (data as unknown as ArticleSummaryRow[]).map(toArticleSummary);
+}
+
+export async function getStatusCounts(profile: Profile): Promise<StatusCounts> {
+  const supabase = await createServerSupabase();
+
+  const entries = await Promise.all(
+    ARTICLE_STATUSES.map(async (status) => {
+      let query = supabase
+        .from("articles")
+        .select("id", { count: "exact", head: true })
+        .eq("status", status);
+      if (!canPublish(profile.role)) query = query.eq("author_id", profile.id);
+
+      const { count, error } = await query;
+      if (error) throw new Error(`Gagal menghitung berita: ${error.message}`);
+      return [status, count ?? 0] as const;
+    }),
+  );
+
+  return Object.fromEntries(entries) as StatusCounts;
 }
 
 export async function getEditableArticle(id: string): Promise<Article | null> {
@@ -64,6 +99,21 @@ export async function changeArticleStatus(id: string, status: ArticleStatus): Pr
   const supabase = await createServerSupabase();
   const { error } = await supabase.from("articles").update({ status }).eq("id", id);
   if (error) throw new Error(`Gagal mengubah status: ${error.message}`);
+}
+
+export async function deleteArticle(id: string): Promise<void> {
+  const supabase = await createServerSupabase();
+  const { error, count } = await supabase.from("articles").delete({ count: "exact" }).eq("id", id);
+
+  if (error) throw new Error(`Gagal menghapus berita: ${error.message}`);
+  if (count === 0) {
+    throw new Error("Berita tidak bisa dihapus. Penulis hanya bisa menghapus draf miliknya.");
+  }
+}
+
+/** % dan _ punya arti khusus di pola LIKE, jadi di-escape agar dicari apa adanya. */
+function escapeLikePattern(text: string): string {
+  return text.replace(/[\\%_]/g, (character) => `\\${character}`);
 }
 
 async function insertArticle(supabase: ServerSupabase, row: Record<string, unknown>): Promise<string> {

@@ -53,3 +53,26 @@ export function toHashtag(name: string): string {
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join("")}`;
 }
+const relativeFormatter = new Intl.RelativeTimeFormat(siteConfig.locale, { numeric: "auto" });
+
+/** "baru saja", "5 menit yang lalu", "kemarin", atau tanggal bila lebih dari seminggu. */
+export function formatRelative(iso: string, now: Date = new Date()): string {
+  const seconds = Math.round((new Date(iso).getTime() - now.getTime()) / 1000);
+  const absolute = Math.abs(seconds);
+
+  if (absolute < 60) return "baru saja";
+  if (absolute < 3600) return relativeFormatter.format(Math.round(seconds / 60), "minute");
+  if (absolute < 86400) return relativeFormatter.format(Math.round(seconds / 3600), "hour");
+  if (absolute < 7 * 86400) return relativeFormatter.format(Math.round(seconds / 86400), "day");
+  return formatDate(iso);
+}
+
+export function countWords(text: string): number {
+  const trimmed = text.trim();
+  return trimmed ? trimmed.split(/\s+/).length : 0;
+}
+
+/** Sama dengan fungsi reading_minutes di database: 200 kata per menit, minimal 1. */
+export function estimateReadingMinutes(text: string): number {
+  return Math.max(1, Math.ceil(countWords(text) / 200));
+}

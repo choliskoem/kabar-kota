@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArticleForm } from "@/components/dashboard/ArticleForm";
 import { canPublish } from "@/lib/roles";
@@ -23,22 +24,31 @@ export default async function EditArticlePage({ params }: EditArticlePageProps) 
   if (!article) notFound();
 
   const isEditor = canPublish(profile.role);
-
-  if (article.status === "published" && !isEditor) {
-    return (
-      <>
-        <h1>{article.title}</h1>
-        <p className={styles.emptyNote}>
-          Berita ini sudah terbit. Minta editor menariknya ke draf jika perlu diubah.
-        </p>
-      </>
-    );
-  }
+  const isLocked = article.status === "published" && !isEditor;
 
   return (
     <>
-      <h1>Ubah berita</h1>
-      <ArticleForm categories={categories} canPublish={isEditor} article={article} />
+      <div className={styles.pageHead}>
+        <div>
+          <Link href="/dashboard" className={styles.backLink}>
+            Kembali ke daftar berita
+          </Link>
+          <h1>{isLocked ? article.title : "Ubah berita"}</h1>
+        </div>
+        {article.status === "published" && (
+          <Link href={`/berita/${article.slug}`} target="_blank" rel="noopener" className={styles.secondaryButton}>
+            Lihat di situs
+          </Link>
+        )}
+      </div>
+
+      {isLocked ? (
+        <div className={styles.empty}>
+          <p>Berita ini sudah terbit. Minta editor menariknya ke draf jika perlu diubah.</p>
+        </div>
+      ) : (
+        <ArticleForm categories={categories} canPublish={isEditor} article={article} />
+      )}
     </>
   );
 }

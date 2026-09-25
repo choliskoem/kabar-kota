@@ -1,58 +1,276 @@
+/* =====================================================================
+   Dashboard redaksi: tenang dan fungsional. Warna kategori hanya dipakai
+   sebagai penanda kecil, stabilo kuning untuk hal yang butuh perhatian.
+   ===================================================================== */
+
 .shell {
   min-height: 100vh;
+  background: var(--paper);
 }
 
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- Bar atas ---------- */
 .topbar {
-  background: var(--ink);
-  color: var(--paper);
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: #15182b;
+  color: #f1f2f8;
 }
 
 .topbarInner {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-3) var(--space-4);
+  gap: var(--space-2) var(--space-5);
   padding-block: var(--space-3);
 }
 
 .brand {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
   font-family: var(--font-display);
   font-size: var(--step-1);
+  font-variation-settings: "wdth" 80;
   font-weight: 800;
-  letter-spacing: -0.03em;
   text-decoration: none;
 }
 
 .brand span {
-  color: var(--stabilo);
+  padding: 0 0.4rem;
+  border-radius: 4px;
+  background: var(--stabilo);
+  color: #15182b;
+  font-size: var(--step--1);
 }
 
 .topnav {
   display: flex;
-  gap: var(--space-3);
-  font-family: var(--font-display);
+  gap: var(--space-1);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.topnav a {
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  color: #c9cde0;
+  font-size: var(--step--1);
+  font-weight: 600;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.topnav a:hover {
+  color: #ffffff;
+  background: rgb(255 255 255 / 0.08);
+}
+
+.topnav a[aria-current="page"] {
+  background: #f1f2f8;
+  color: #15182b;
 }
 
 .account {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--space-2);
   margin-left: auto;
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  background: var(--stabilo);
+  color: #15182b;
   font-family: var(--font-display);
+  font-weight: 800;
+}
+
+.accountText {
+  display: grid;
+  line-height: 1.2;
   font-size: var(--step--1);
 }
 
+.accountText span {
+  color: #a0a6bf;
+}
+
+.signOut {
+  margin-left: var(--space-2);
+  padding: 0.4rem 0.8rem;
+  border: 1px solid rgb(255 255 255 / 0.25);
+  border-radius: 999px;
+  background: none;
+  color: inherit;
+  font-size: var(--step--1);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.signOut:hover {
+  background: rgb(255 255 255 / 0.08);
+}
+
+/* ---------- Kerangka halaman ---------- */
 .main {
   display: grid;
   gap: var(--space-4);
-  padding-block: var(--space-5);
+  padding-block: var(--space-5) var(--space-6);
 }
 
-.main h1 {
-  font-size: var(--step-3);
+/* Anak grid default-nya tidak mau lebih sempit dari isinya; ini mencegah halaman melebar di HP. */
+.main > *,
+.toolbar > * {
+  min-width: 0;
+  max-width: 100%;
 }
 
 .pageHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.pageHead h1 {
+  font-size: var(--step-3);
+  font-weight: 800;
+}
+
+.lede {
+  margin-top: var(--space-1);
+  color: var(--muted);
+}
+
+.backLink {
+  display: inline-block;
+  margin-bottom: var(--space-2);
+  color: var(--muted);
+  font-size: var(--step--1);
+  font-weight: 600;
+}
+
+/* ---------- Tombol ---------- */
+.primaryButton,
+.secondaryButton,
+.smallPrimaryButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  border-radius: var(--radius);
+  font-family: var(--font-body);
+  font-weight: 700;
+  line-height: 1.2;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+.primaryButton {
+  padding: 0.75rem 1.2rem;
+  border: 2px solid var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.primaryButton:hover {
+  background: color-mix(in srgb, var(--ink) 85%, var(--paper));
+}
+
+.secondaryButton {
+  padding: 0.75rem 1.2rem;
+  border: 2px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.secondaryButton:hover {
+  border-color: var(--ink);
+}
+
+.smallPrimaryButton {
+  padding: 0.4rem 0.8rem;
+  border: 0;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: var(--step--1);
+}
+
+.textButton {
+  padding: 0.4rem 0.5rem;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--ink);
+  font-size: var(--step--1);
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.textButton:hover {
+  background: color-mix(in srgb, var(--ink) 8%, transparent);
+}
+
+.dangerText {
+  color: var(--danger);
+}
+
+.primaryButton:active,
+.secondaryButton:active,
+.smallPrimaryButton:active {
+  transform: translateY(1px);
+}
+
+.primaryButton:disabled,
+.secondaryButton:disabled,
+.smallPrimaryButton:disabled,
+.textButton:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+/* ---------- Pesan berhasil ---------- */
+.flash {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 0.8rem 1rem;
+  border: 2px solid var(--success);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--success) 14%, var(--surface));
+  font-weight: 600;
+}
+
+.flashClose {
+  border: 0;
+  background: none;
+  color: inherit;
+  font-size: var(--step--1);
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* ---------- Tab status & pencarian ---------- */
+.toolbar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -60,138 +278,304 @@
   gap: var(--space-3);
 }
 
-.emptyNote {
+.tabs {
+  display: flex;
+  gap: var(--space-1);
+  padding: 0.25rem;
+  border-radius: 999px;
+  background: var(--surface);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tabs a {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
   color: var(--muted);
-}
-
-/* ---------- Tombol ---------- */
-.primaryButton,
-.secondaryButton {
-  display: inline-block;
-  padding: 0.65rem 1.1rem;
-  border-radius: var(--radius);
-  font-family: var(--font-display);
-  font-size: var(--step-0);
+  font-size: var(--step--1);
   font-weight: 700;
+  white-space: nowrap;
   text-decoration: none;
-  cursor: pointer;
 }
 
-.primaryButton {
-  border: 2px solid var(--ink);
+.tabs a:hover {
+  color: var(--ink);
+}
+
+.tabs a[aria-current="page"] {
   background: var(--ink);
   color: var(--paper);
 }
 
-.secondaryButton {
-  border: 2px solid var(--ink);
-  background: transparent;
-  color: var(--ink);
+.tabCount {
+  min-width: 1.4rem;
+  padding: 0.05rem 0.4rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, currentColor 14%, transparent);
+  font-size: 0.75rem;
+  text-align: center;
 }
 
-.linkButton {
-  padding: 0;
-  border: 0;
-  background: none;
-  color: inherit;
-  font: inherit;
-  text-decoration: underline;
-  text-underline-offset: 0.18em;
-  cursor: pointer;
+/* Status yang menunggu tindakan (mis. "Menunggu editor" bagi editor) */
+.tabs a[data-attention] .tabCount {
+  background: var(--stabilo);
+  color: #15182b;
 }
 
-.primaryButton:disabled,
-.secondaryButton:disabled,
-.linkButton:disabled {
-  opacity: 0.55;
-  cursor: progress;
+.search {
+  display: flex;
+  gap: var(--space-2);
+  min-width: min(100%, 20rem);
 }
 
-/* ---------- Tabel ---------- */
-.tableWrap {
-  overflow-x: auto;
-  background: var(--surface);
-  border: 1px solid var(--line);
+.search input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.6rem 0.9rem;
+  border: 2px solid var(--line);
   border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
 }
 
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  font-family: var(--font-display);
-  font-size: var(--step--1);
+.search input:focus {
+  border-color: var(--ink);
+  outline: none;
 }
 
-.table th,
-.table td {
-  padding: 0.75rem 1rem;
+.search .secondaryButton {
+  padding-block: 0.55rem;
+}
+
+/* ---------- Daftar berita ---------- */
+.list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  list-style: none;
+}
+
+.item {
+  display: grid;
+  grid-template-columns: 4rem minmax(0, 1fr) 9rem 15rem;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
   border-bottom: 1px solid var(--line);
-  text-align: left;
-  vertical-align: top;
 }
 
-.table th {
-  color: var(--muted);
-  font-weight: 600;
-}
-
-.table tr:last-child td {
+.item:last-child {
   border-bottom: 0;
 }
 
-.table td:first-child {
-  min-width: 18rem;
+.item:hover {
+  background: color-mix(in srgb, var(--route) 6%, var(--surface));
+}
+
+.itemThumb {
+  display: grid;
+  place-items: center;
+  width: 4rem;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 8px;
+  background: var(--route);
+  color: var(--on-route);
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  font-weight: 800;
+}
+
+.itemThumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.itemBody {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.itemTitle {
+  font-family: var(--font-body);
   font-size: var(--step-0);
+  font-variation-settings: normal;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: 0;
+}
+
+.itemTitle a {
+  text-decoration: none;
+}
+
+.itemTitle a:hover {
+  text-decoration: underline;
+}
+
+.itemMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem var(--space-3);
+  color: var(--muted);
+  font-size: var(--step--1);
+}
+
+.itemCategory {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--ink);
   font-weight: 600;
+}
+
+.itemCategory::before {
+  content: "";
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  background: var(--route);
+}
+
+.itemActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-1);
 }
 
 .status {
   display: inline-block;
-  padding: 0.15rem 0.6rem;
+  justify-self: start;
+  padding: 0.2rem 0.65rem;
   border-radius: 999px;
   background: var(--line);
+  color: var(--ink);
+  font-size: 0.8125rem;
+  font-weight: 700;
   white-space: nowrap;
 }
 
 .status[data-status="review"] {
-  background: color-mix(in srgb, var(--stabilo) 30%, transparent);
+  background: var(--stabilo);
+  color: #15182b;
 }
 
 .status[data-status="published"] {
-  background: color-mix(in srgb, var(--success) 25%, transparent);
+  background: color-mix(in srgb, var(--success) 22%, var(--surface));
 }
 
-/* ---------- Formulir ---------- */
-.form {
+.empty {
   display: grid;
-  gap: var(--space-4);
-  max-width: 48rem;
+  justify-items: start;
+  gap: var(--space-3);
+  padding: var(--space-5) var(--space-4);
+  border: 2px dashed var(--line);
+  border-radius: var(--radius-lg);
+  color: var(--muted);
 }
 
-.row {
+/* ---------- Formulir berita ---------- */
+.editor {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  grid-template-columns: minmax(0, 1fr) 21rem;
+  align-items: start;
   gap: var(--space-4);
+}
+
+.editorMain {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.editorSide {
+  position: sticky;
+  top: 5.5rem;
+  display: grid;
+  gap: var(--space-3);
+}
+
+.panel {
+  display: grid;
+  justify-items: stretch;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.panel > .status {
+  justify-self: start;
+}
+
+.panelTitle {
+  font-family: var(--font-body);
+  font-size: var(--step-0);
+  font-variation-settings: normal;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.formAlert {
+  padding: 0.8rem 1rem;
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--danger) 12%, var(--surface));
+  color: var(--danger);
+  font-weight: 700;
 }
 
 .field {
   display: grid;
-  gap: var(--space-1);
-  font-family: var(--font-display);
-  font-weight: 600;
+  gap: 0.35rem;
 }
 
-.field input:not([type="file"]),
-.field select,
+.fieldLabelRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.field label,
+.fieldLabelRow label {
+  font-size: var(--step--1);
+  font-weight: 700;
+}
+
+.field input,
 .field textarea {
   width: 100%;
-  padding: 0.65rem 0.8rem;
-  border: 1px solid var(--line);
+  padding: 0.7rem 0.85rem;
+  border: 2px solid var(--line);
   border-radius: var(--radius);
   background: var(--surface);
   color: var(--ink);
   font: inherit;
-  font-weight: 400;
+}
+
+.field input:focus,
+.field textarea:focus {
+  border-color: var(--ink);
+  outline: none;
+}
+
+.field[data-invalid] input,
+.field[data-invalid] textarea {
+  border-color: var(--danger);
 }
 
 .field textarea {
@@ -199,77 +583,215 @@
 }
 
 .titleInput {
+  font-family: var(--font-display) !important;
   font-size: var(--step-2) !important;
-  font-weight: 700 !important;
+  font-variation-settings: "wdth" 80;
+  font-weight: 800;
+  line-height: 1.15;
 }
 
 .bodyInput {
-  font-family: var(--font-body) !important;
   font-size: 1.0625rem !important;
-  line-height: 1.7;
+  line-height: 1.75;
+}
+
+.counter {
+  color: var(--muted);
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.counter[data-over] {
+  color: var(--danger);
+  font-weight: 700;
 }
 
 .hint {
   color: var(--muted);
-  font-family: var(--font-display);
   font-size: var(--step--1);
-  font-weight: 400;
+  line-height: 1.45;
 }
 
-.error {
+.fieldError {
   color: var(--danger);
-  font-family: var(--font-display);
   font-size: var(--step--1);
-  font-weight: 600;
+  font-weight: 700;
+}
+
+.submitStack {
+  display: grid;
+  gap: var(--space-2);
+}
+
+/* Pilihan kategori berbentuk tombol */
+.choiceGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.choice {
+  position: relative;
+  cursor: pointer;
+}
+
+.choice input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.choice span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.8rem;
+  border: 2px solid var(--line);
+  border-radius: 999px;
+  font-size: var(--step--1);
+  font-weight: 700;
+}
+
+.choice span::before {
+  content: "";
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 50%;
+  background: var(--route);
+}
+
+.choice:hover span {
+  border-color: var(--ink);
+}
+
+.choice input:checked + span {
+  border-color: var(--ink);
+  background: var(--route);
+  color: var(--on-route);
+}
+
+.choice input:checked + span::before {
+  background: var(--on-route);
+}
+
+.choice input:focus-visible + span {
+  outline: 3px solid var(--stabilo);
+  outline-offset: 2px;
+}
+
+.tagPreview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tagPreview li {
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  background: var(--paper);
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+/* ---------- Unggah foto ---------- */
+.uploader,
+.pending,
+.currentCover {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.coverPreview {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: var(--radius);
+}
+
+.dropzone {
+  display: grid;
+  justify-items: center;
+  gap: 0.2rem;
+  padding: var(--space-5) var(--space-3);
+  border: 2px dashed var(--line);
+  border-radius: var(--radius);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.dropzone:hover,
+.dropzone[data-dragging] {
+  border-color: var(--ink);
+  background: color-mix(in srgb, var(--stabilo) 25%, var(--surface));
 }
 
 .actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--space-2);
 }
 
-/* ---------- Unggah gambar ---------- */
-.uploader {
-  display: grid;
-  gap: var(--space-3);
-  margin: 0;
-  padding: var(--space-4);
-  border: 1px dashed var(--muted);
-  border-radius: var(--radius);
-}
-
-.uploader legend {
-  padding-inline: var(--space-2);
-  font-family: var(--font-display);
-  font-weight: 700;
-}
-
-.currentCover,
-.pending {
-  display: grid;
-  grid-template-columns: 10rem minmax(0, 1fr);
-  gap: var(--space-3);
-  align-items: start;
-}
-
-.currentCover img,
-.preview {
-  width: 100%;
-  aspect-ratio: 3 / 2;
-  object-fit: cover;
-  border-radius: var(--radius);
-}
-
-.pendingFields {
-  display: grid;
-  gap: var(--space-3);
-}
-
-@media (max-width: 600px) {
-  .currentCover,
-  .pending {
+/* ---------- Responsif ---------- */
+@media (max-width: 1000px) {
+  .editor {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .editorSide {
+    position: static;
+  }
+}
+
+@media (max-width: 760px) {
+  .topbar {
+    position: static;
+  }
+
+  .topbarInner {
+    gap: var(--space-2);
+  }
+
+  /* Baris 1: logo + akun, baris 2: menu */
+  .topnav {
+    order: 3;
+    width: 100%;
+  }
+
+  .accountText {
+    display: none;
+  }
+
+  .search {
+    width: 100%;
+  }
+
+  .item {
+    grid-template-columns: 3.5rem minmax(0, 1fr);
+    padding: var(--space-3);
+  }
+
+  .itemThumb {
+    width: 3.5rem;
+    grid-row: span 2;
+  }
+
+  .status {
+    grid-column: 2;
+  }
+
+  .itemActions {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .editorMain,
+  .panel {
+    padding: var(--space-3);
   }
 }

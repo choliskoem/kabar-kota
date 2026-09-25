@@ -2,10 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { createServerSupabase } from "@/lib/supabase/server";
+import { flashKeyForStatus } from "@/lib/flash";
 import { canPublish } from "@/lib/roles";
+import { createServerSupabase } from "@/lib/supabase/server";
 import { requireStaff } from "@/services/auth";
-import { changeArticleStatus, saveArticle } from "@/services/editorial";
+import { changeArticleStatus, deleteArticle, saveArticle } from "@/services/editorial";
 import type { ArticleStatus } from "@/types/domain";
 import { articleInputSchema, articleStatusSchema, toFieldErrors } from "@/validation/article";
 import type { ArticleFormState } from "@/validation/article-form-state";
@@ -20,7 +21,7 @@ export async function saveArticleAction(
   const parsed = articleInputSchema.safeParse(Object.fromEntries(formData));
 
   if (!parsed.success) {
-    return { message: "Periksa lagi isian yang ditandai.", fieldErrors: toFieldErrors(parsed.error) };
+    return { message: "Ada isian yang perlu diperbaiki.", fieldErrors: toFieldErrors(parsed.error) };
   }
   if (parsed.data.status === "published" && !canPublish(profile.role)) {
     return { message: PUBLISH_DENIED, fieldErrors: {} };
@@ -33,7 +34,7 @@ export async function saveArticleAction(
   }
 
   revalidateNewsPages();
-  redirect("/dashboard");
+  redirect(`/dashboard?pesan=${flashKeyForStatus(parsed.data.status)}`);
 }
 
 export async function changeStatusAction(articleId: string, status: ArticleStatus): Promise<void> {
@@ -42,6 +43,13 @@ export async function changeStatusAction(articleId: string, status: ArticleStatu
   if (nextStatus === "published" && !canPublish(profile.role)) throw new Error(PUBLISH_DENIED);
 
   await changeArticleStatus(articleId, nextStatus);
+  revalidateNewsPages();
+  revalidatePath("/dashboard");
+}
+
+export async function deleteArticleAction(articleId: string): Promise<void> {
+  await requireStaff();
+  await deleteArticle(articleId);
   revalidateNewsPages();
   revalidatePath("/dashboard");
 }
@@ -57,4 +65,5 @@ function revalidateNewsPages(): void {
   revalidatePath("/");
   revalidatePath("/berita/[slug]", "page");
   revalidatePath("/kategori/[slug]", "page");
+  revalidatePath("/tag/[slug]", "page");
 }
