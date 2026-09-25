@@ -24,7 +24,9 @@ export async function updateSession(request: NextRequest) {
     },
   });
 
-    const { pathname, search, searchParams } = request.nextUrl;
+  const { data } = await supabase.auth.getClaims();
+  const isLoggedIn = Boolean(data?.claims);
+  const { pathname, search, searchParams } = request.nextUrl;
 
   if (!isLoggedIn && pathname.startsWith(PROTECTED_PREFIX)) {
     const loginUrl = new URL(LOGIN_PATH, request.url);
