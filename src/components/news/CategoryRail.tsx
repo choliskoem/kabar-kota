@@ -17,6 +17,9 @@ export function CategoryRail({ section }: { section: CategorySection }) {
         </h2>
         <Link href={`/kategori/${category.slug}`} className={styles.railMore}>
           Lihat semua
+          <span className={styles.arrow} aria-hidden="true">
+            →
+          </span>
         </Link>
       </header>
       <div className={styles.railTrack}>

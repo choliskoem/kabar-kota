@@ -82,3 +82,10 @@ export function countWords(text: string): number {
 export function estimateReadingMinutes(text: string): number {
   return Math.max(1, Math.ceil(countWords(text) / 200));
 }
+
+const FRESH_WINDOW_MS = 60 * 60 * 1000;
+
+/** Berita dianggap "baru" bila terbit kurang dari satu jam lalu. */
+export function isFresh(iso: string, now: Date = new Date()): boolean {
+  return now.getTime() - new Date(iso).getTime() < FRESH_WINDOW_MS;
+}

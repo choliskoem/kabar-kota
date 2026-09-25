@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { isFresh } from "@/lib/format";
 import type { ArticleSummary } from "@/types/domain";
 import { StoryMeta } from "./StoryMeta";
 import { routeStyle } from "./route-style";
@@ -6,7 +7,7 @@ import styles from "./news.module.css";
 
 /**
  * Berita terbaru digambar sebagai halte di satu jalur, urut dari yang paling baru.
- * Daftarnya bisa di-scroll di dalam panel supaya beranda tetap ringkas.
+ * Halte berita yang terbit kurang dari satu jam lalu berdenyut sebagai penanda.
  */
 export function LatestLine({ articles }: { articles: ArticleSummary[] }) {
   return (
@@ -24,15 +25,26 @@ export function LatestLine({ articles }: { articles: ArticleSummary[] }) {
         data-lenis-prevent
       >
         <ol className={styles.line}>
-          {articles.map((article) => (
-            <li key={article.id} className={styles.stop} style={routeStyle(article.category.color)}>
-              <span className={styles.stopCategory}>{article.category.name}</span>
-              <Link href={`/berita/${article.slug}`} className={styles.stopTitle}>
-                {article.title}
-              </Link>
-              <StoryMeta article={article} />
-            </li>
-          ))}
+          {articles.map((article) => {
+            const fresh = article.publishedAt ? isFresh(article.publishedAt) : false;
+            return (
+              <li
+                key={article.id}
+                className={styles.stop}
+                style={routeStyle(article.category.color)}
+                data-fresh={fresh ? "" : undefined}
+              >
+                <span className={styles.stopCategory}>
+                  {article.category.name}
+                  {fresh && <span className={styles.freshBadge}>Baru</span>}
+                </span>
+                <Link href={`/berita/${article.slug}`} className={styles.stopTitle}>
+                  {article.title}
+                </Link>
+                <StoryMeta article={article} />
+              </li>
+            );
+          })}
         </ol>
       </div>
     </section>

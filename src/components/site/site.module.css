@@ -165,3 +165,72 @@
     width: calc(100% + var(--gutter));
   }
 }
+/* =====================================================================
+   Mikrointeraksi & animasi
+   ===================================================================== */
+
+/* Logo: tertekan saat diklik */
+.logo:active {
+  box-shadow: 1px 1px 0 var(--ink);
+  transform: rotate(0deg) translate(3px, 3px);
+}
+
+/* Menu kategori: sedikit terangkat saat disentuh, titiknya membesar */
+.nav a {
+  transition: background-color var(--duration-fast) ease, border-color var(--duration-fast) ease,
+    color var(--duration-fast) ease, transform var(--duration-fast) var(--ease-out);
+}
+
+.nav a:hover {
+  transform: translateY(-2px);
+}
+
+.nav a:active {
+  transform: translateY(0) scale(0.96);
+}
+
+.nav a::before {
+  transition: transform var(--duration) var(--ease-spring);
+}
+
+.nav a:hover::before {
+  transform: scale(1.35);
+}
+
+/* Desktop: header mengecil saat halaman digulir supaya ruang baca bertambah */
+@media (min-width: 701px) and (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: scroll()) {
+    .header,
+    .headerInner,
+    .logoText {
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: scroll(root);
+      animation-range: 0 160px;
+    }
+
+    .header {
+      animation-name: header-shadow;
+    }
+
+    .headerInner {
+      animation-name: header-compact;
+    }
+
+    .logoText {
+      animation-name: logo-compact;
+    }
+  }
+}
+
+@keyframes header-shadow {
+  to { box-shadow: 0 8px 24px -16px rgb(21 24 43 / 0.45); }
+}
+
+@keyframes header-compact {
+  to { padding-block: 0.45rem; }
+}
+
+@keyframes logo-compact {
+  to { font-size: 1.5rem; }
+}

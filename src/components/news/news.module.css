@@ -424,3 +424,138 @@
     max-height: 22rem;
   }
 }
+
+/* =====================================================================
+   Mikrointeraksi & animasi
+   Semua gerak berbasis gulir hanya aktif bila browser mendukung
+   animation-timeline dan pengguna tidak memilih "kurangi gerakan".
+   ===================================================================== */
+
+/* Stiker: bergoyang saat disentuh, "tertekan" saat diklik */
+.sticker:hover {
+  animation: sticker-wiggle 0.45s var(--ease-out);
+}
+
+.sticker:active {
+  box-shadow: 1px 1px 0 var(--ink);
+  transform: rotate(0deg) translate(2px, 2px);
+}
+
+@keyframes sticker-wiggle {
+  0% { rotate: 0deg; }
+  30% { rotate: 4deg; }
+  60% { rotate: -3deg; }
+  100% { rotate: 0deg; }
+}
+
+/* "Lihat semua": panah bergeser, tombol sedikit terangkat */
+.railMore {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: background-color var(--duration-fast) ease, color var(--duration-fast) ease,
+    transform var(--duration-fast) ease;
+}
+
+.railMore:active {
+  transform: scale(0.96);
+}
+
+.arrow {
+  display: inline-block;
+  transition: transform var(--duration) var(--ease-spring);
+}
+
+.railMore:hover .arrow {
+  transform: translateX(4px);
+}
+
+/* Kartu berita: foto sedikit terangkat saat disentuh */
+.storyMedia {
+  transition: transform var(--duration) var(--ease-out), box-shadow var(--duration) var(--ease-out);
+}
+
+.story:hover .storyMedia {
+  box-shadow: 0 14px 30px -18px rgb(21 24 43 / 0.55);
+  transform: translateY(-4px);
+}
+
+.story:active .storyMedia {
+  transform: translateY(-1px) scale(0.99);
+}
+
+/* Halte Terkini: titik membesar saat judul disentuh */
+.stop::before {
+  transition: transform var(--duration) var(--ease-spring);
+}
+
+.stop:hover::before {
+  transform: scale(1.25);
+}
+
+/* Berita kurang dari 1 jam: halte berdenyut + label "Baru" */
+.freshBadge {
+  margin-left: 0.4rem;
+  padding: 0.05rem 0.45rem;
+  border-radius: 999px;
+  background: var(--stabilo);
+  color: #15182b;
+  font-size: 0.7rem;
+}
+
+.stop[data-fresh]::after {
+  content: "";
+  position: absolute;
+  top: 0.1rem;
+  left: 0;
+  width: 1.35rem;
+  height: 1.35rem;
+  border-radius: 50%;
+  background: var(--route);
+  animation: fresh-pulse 1.8s var(--ease-out) infinite;
+  pointer-events: none;
+}
+
+@keyframes fresh-pulse {
+  0% { opacity: 0.7; transform: scale(1); }
+  100% { opacity: 0; transform: scale(2.4); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    /* Foto poster bergerak lebih lambat dari halaman (parallax) saat digulir keluar */
+    .posterMedia .image {
+      animation: poster-parallax linear both;
+      animation-timeline: view();
+      animation-range: exit 0% exit 100%;
+    }
+
+    /* Judul seksi dan kartu muncul saat masuk layar, kartu bergantian */
+    .railHead,
+    .story {
+      animation: rise-in linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 55%;
+    }
+
+    .railTrack > :nth-child(2),
+    .grid > :nth-child(3n + 2) {
+      animation-range: entry 10% entry 65%;
+    }
+
+    .railTrack > :nth-child(3),
+    .grid > :nth-child(3n + 3) {
+      animation-range: entry 20% entry 75%;
+    }
+  }
+}
+
+@keyframes poster-parallax {
+  from { transform: scale(1.12) translateY(0); }
+  to { transform: scale(1.12) translateY(10%); }
+}
+
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(28px); }
+  to { opacity: 1; transform: translateY(0); }
+}

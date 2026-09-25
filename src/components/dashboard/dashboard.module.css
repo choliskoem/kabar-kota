@@ -795,3 +795,83 @@
     padding: var(--space-3);
   }
 }
+
+/* =====================================================================
+   Mikrointeraksi & animasi
+   ===================================================================== */
+
+/* Tab status: perpindahan warna halus */
+.tabs a {
+  transition: background-color var(--duration-fast) ease, color var(--duration-fast) ease;
+}
+
+/* Baris berita: thumbnail sedikit miring saat baris disentuh */
+.item {
+  transition: background-color var(--duration-fast) ease;
+}
+
+.itemThumb {
+  transition: transform var(--duration) var(--ease-spring);
+}
+
+.item:hover .itemThumb {
+  transform: rotate(-3deg) scale(1.06);
+}
+
+/* Kategori terpilih "memantul" */
+.choice span {
+  transition: background-color var(--duration-fast) ease, border-color var(--duration-fast) ease,
+    color var(--duration-fast) ease;
+}
+
+.choice input:checked + span {
+  animation: choice-pop 0.35s var(--ease-spring);
+}
+
+.choice:active span {
+  transform: scale(0.95);
+}
+
+@keyframes choice-pop {
+  0% { transform: scale(0.9); }
+  60% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+/* Area unggah foto membesar saat foto diseret ke atasnya */
+.dropzone {
+  transition: border-color var(--duration-fast) ease, background-color var(--duration-fast) ease,
+    transform var(--duration) var(--ease-spring);
+}
+
+.dropzone[data-dragging] {
+  transform: scale(1.03);
+}
+
+/* Penghitung karakter bergetar saat melewati batas */
+.counter[data-over] {
+  animation: shake 0.3s var(--ease-out);
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Pesan berhasil meluncur dari atas */
+  .flash {
+    animation: flash-in 0.45s var(--ease-spring);
+  }
+
+  /* Pesan error formulir bergetar sekali agar terlihat */
+  .formAlert {
+    animation: shake 0.35s var(--ease-out);
+  }
+}
+
+@keyframes flash-in {
+  from { opacity: 0; transform: translateY(-12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
