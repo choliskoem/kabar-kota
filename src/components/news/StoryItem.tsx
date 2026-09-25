@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { formatDate } from "@/lib/format";
 import type { ArticleSummary } from "@/types/domain";
 import { NewsImage } from "./NewsImage";
+import { StoryMeta } from "./StoryMeta";
 import styles from "./news.module.css";
 
 export function StoryItem({ article }: { article: ArticleSummary }) {
@@ -12,7 +12,8 @@ export function StoryItem({ article }: { article: ArticleSummary }) {
           media={article.cover}
           category={article.category}
           variant="thumb"
-          sizes="(max-width: 700px) 100vw, 33vw"
+          sizes="(max-width: 700px) 80vw, 33vw"
+          fill
         />
       </div>
       <h3 className={styles.storyTitle}>
@@ -20,11 +21,7 @@ export function StoryItem({ article }: { article: ArticleSummary }) {
           {article.title}
         </Link>
       </h3>
-      {article.publishedAt && (
-        <time className={styles.meta} dateTime={article.publishedAt}>
-          {formatDate(article.publishedAt)}
-        </time>
-      )}
+      <StoryMeta article={article} />
     </article>
   );
 }

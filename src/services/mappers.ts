@@ -4,15 +4,23 @@ import type {
   CategoryRow,
   MediaRow,
   ProfileRow,
+  TrendingTagRow,
 } from "@/types/database-rows";
-import type { Article, ArticleSummary, Category, Media, Profile } from "@/types/domain";
+import type {
+  Article,
+  ArticleSummary,
+  Category,
+  Media,
+  Profile,
+  TrendingTag,
+} from "@/types/domain";
 
 export const CATEGORY_COLUMNS = "id, name, slug, color";
 export const MEDIA_COLUMNS =
   "id, storage_path, thumb_path, width, height, alt_text, caption, credit";
 
 export const ARTICLE_SUMMARY_COLUMNS = `
-  id, slug, title, excerpt, status, published_at, updated_at,
+  id, slug, title, excerpt, status, published_at, updated_at, reading_minutes,
   category:categories!inner(${CATEGORY_COLUMNS}),
   cover:media(${MEDIA_COLUMNS}),
   author:profiles(full_name)
@@ -57,7 +65,12 @@ export function toArticleSummary(row: ArticleSummaryRow): ArticleSummary {
     category: toCategory(row.category),
     cover: row.cover ? toMedia(row.cover) : null,
     authorName: row.author?.full_name || "Redaksi",
+    readingMinutes: row.reading_minutes,
   };
+}
+
+export function toTrendingTag(row: TrendingTagRow): TrendingTag {
+  return { id: row.id, name: row.name, slug: row.slug, articleCount: row.article_count };
 }
 
 export function toArticle(row: ArticleRow): Article {

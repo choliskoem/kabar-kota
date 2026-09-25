@@ -10,8 +10,8 @@ interface LeadRevealProps {
 }
 
 /**
- * Satu-satunya animasi otomatis di halaman: garis jalur berita utama "ditarik",
- * lalu judul dan ringkasannya muncul. Dilewati bila pengguna memilih kurangi gerakan.
+ * Satu-satunya animasi otomatis di beranda: blok judul poster naik,
+ * lalu stiker kategori "ditempel". Dilewati bila pengguna memilih kurangi gerakan.
  */
 export function LeadReveal({ className, style, children }: LeadRevealProps) {
   const rootRef = useRef<HTMLElement>(null);
@@ -24,15 +24,17 @@ export function LeadReveal({ className, style, children }: LeadRevealProps) {
     media.add("(prefers-reduced-motion: no-preference)", () => {
       gsap
         .timeline({ defaults: { ease: "power3.out" } })
-        .from(root.querySelectorAll('[data-reveal="route"]'), {
-          scaleY: 0,
-          transformOrigin: "top center",
-          duration: 0.9,
+        .from(root.querySelectorAll('[data-reveal="slab"]'), {
+          yPercent: 30,
+          autoAlpha: 0,
+          duration: 0.8,
+          // Hapus transform setelah selesai agar tautan poster menutupi seluruh poster.
+          clearProps: "transform",
         })
         .from(
-          root.querySelectorAll('[data-reveal="text"]'),
-          { y: 24, autoAlpha: 0, duration: 0.7, stagger: 0.08 },
-          "-=0.55",
+          root.querySelectorAll('[data-reveal="sticker"]'),
+          { scale: 0.4, rotate: -18, autoAlpha: 0, duration: 0.5, ease: "back.out(2.2)", clearProps: "transform" },
+          "-=0.35",
         );
     });
 

@@ -1,28 +1,36 @@
-.front {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(16rem, 22rem);
-  gap: var(--space-5);
-  padding-block: var(--space-5);
-}
-
-.sections {
+.home {
   display: grid;
   gap: var(--space-6);
+  padding-top: var(--space-4);
+}
+
+.front {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.side {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  gap: var(--space-4);
+  align-items: start;
 }
 
 .empty {
   display: grid;
+  justify-items: start;
   gap: var(--space-3);
   max-width: 40rem;
   padding-block: var(--space-6);
 }
 
 .empty h1 {
-  font-size: var(--step-3);
+  font-size: var(--step-4);
+  font-weight: 800;
 }
 
 @media (max-width: 900px) {
-  .front {
+  .side {
     grid-template-columns: minmax(0, 1fr);
   }
 }

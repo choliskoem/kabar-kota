@@ -11,7 +11,7 @@ export default async function PublicLayout({ children }: { children: React.React
       <SmoothScroll />
       <SiteHeader categories={categories} />
       <main>{children}</main>
-      <SiteFooter />
+      <SiteFooter categories={categories} />
     </>
   );
 }

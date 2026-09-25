@@ -24,7 +24,7 @@
 }
 
 .brand span {
-  color: var(--signal);
+  color: var(--stabilo);
 }
 
 .topnav {
@@ -154,7 +154,7 @@
 }
 
 .status[data-status="review"] {
-  background: color-mix(in srgb, var(--signal) 30%, transparent);
+  background: color-mix(in srgb, var(--stabilo) 30%, transparent);
 }
 
 .status[data-status="published"] {

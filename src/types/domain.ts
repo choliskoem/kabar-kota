@@ -20,6 +20,10 @@ export interface Tag {
   slug: string;
 }
 
+export interface TrendingTag extends Tag {
+  articleCount: number;
+}
+
 export interface Media {
   id: string;
   storagePath: string;
@@ -42,6 +46,7 @@ export interface ArticleSummary {
   category: Category;
   cover: Media | null;
   authorName: string;
+  readingMinutes: number;
 }
 
 export interface Article extends ArticleSummary {

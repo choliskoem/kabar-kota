@@ -41,3 +41,15 @@ export function formatStamp(iso: string, now: Date = new Date()): string {
   const isToday = dayKeyFormatter.format(date) === dayKeyFormatter.format(now);
   return isToday ? formatTime(iso) : shortDateFormatter.format(date);
 }
+
+export function formatReadingTime(minutes: number): string {
+  return `${minutes} mnt baca`;
+}
+
+/** "Anak Muda" → "#AnakMuda" */
+export function toHashtag(name: string): string {
+  return `#${name
+    .split(/\s+/)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join("")}`;
+}

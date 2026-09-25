@@ -21,6 +21,10 @@ export interface TagRow {
   slug: string;
 }
 
+export interface TrendingTagRow extends TagRow {
+  article_count: number;
+}
+
 export interface MediaRow {
   id: string;
   storage_path: string;
@@ -43,6 +47,7 @@ export interface ArticleSummaryRow {
   category: CategoryRow;
   cover: MediaRow | null;
   author: Pick<ProfileRow, "full_name"> | null;
+  reading_minutes: number;
 }
 
 export interface ArticleRow extends ArticleSummaryRow {

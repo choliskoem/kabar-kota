@@ -12,11 +12,13 @@ interface NewsImageProps {
   variant: "large" | "thumb";
   sizes: string;
   priority?: boolean;
+  /** Mengisi penuh wadah induk (wadah harus position: relative). */
+  fill?: boolean;
 }
 
-export function NewsImage({ media, category, variant, sizes, priority = false }: NewsImageProps) {
+export function NewsImage({ media, category, variant, sizes, priority = false, fill = false }: NewsImageProps) {
   if (!media) {
-    // Berita tanpa foto tetap punya bidang visual: warna jalur kategorinya.
+    // Berita tanpa foto tetap punya bidang visual: blok warna kategorinya.
     return (
       <div className={styles.imageFallback} style={routeStyle(category.color)} aria-hidden="true">
         <span>{category.name}</span>
@@ -25,13 +27,21 @@ export function NewsImage({ media, category, variant, sizes, priority = false }:
   }
 
   const isThumb = variant === "thumb";
+  const src = publicImageUrl(isThumb ? media.thumbPath : media.storagePath);
+
+  if (fill) {
+    return (
+      <Image className={styles.image} src={src} alt={media.altText} fill sizes={sizes} priority={priority} />
+    );
+  }
+
   const width = isThumb ? Math.min(THUMB_WIDTH, media.width) : media.width;
   const height = Math.round((media.height / media.width) * width);
 
   return (
     <Image
       className={styles.image}
-      src={publicImageUrl(isThumb ? media.thumbPath : media.storagePath)}
+      src={src}
       alt={media.altText}
       width={width}
       height={height}

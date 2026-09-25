@@ -4,7 +4,8 @@ Portal berita kota untuk pembaca muda. Dibangun dengan **Next.js 16 (App Router)
 
 ## Fitur
 
-- Beranda dengan berita utama, jalur "Terkini", dan seksi per kategori, dirender statis (ISR) sehingga cepat.
+- Beranda bergaya poster: berita utama dengan blok warna kategori, jalur "Terkini", hashtag "Lagi rame", dan baris berita per kategori yang bisa di-swipe di HP. Dirender statis (ISR) sehingga cepat.
+- Halaman hashtag (`/tag/[slug]`), estimasi waktu baca, bar progres membaca, tombol Bagikan (membuka menu share bawaan HP), dan rekomendasi "Baca juga".
 - Halaman berita dan halaman kategori, lengkap dengan metadata untuk dibagikan ke media sosial.
 - Dashboard redaksi: tulis, ubah, kirim ke editor, terbitkan, dan tarik berita.
 - Unggah foto sampul: dikompres dan diubah ke WebP **di browser** (ukuran besar 1600 px + thumbnail 480 px), lalu dikirim langsung ke Supabase Storage.
@@ -23,7 +24,10 @@ Portal berita kota untuk pembaca muda. Dibangun dengan **Next.js 16 (App Router)
 
 ### 1. Buat project Supabase
 
-Buat project baru di [supabase.com](https://supabase.com), lalu buka **SQL Editor** dan jalankan isi file `supabase/migrations/20260925000000_init.sql`. File ini membuat semua tabel, trigger, aturan RLS, dan bucket `news-images`.
+Buat project baru di [supabase.com](https://supabase.com), lalu buka **SQL Editor** dan jalankan file migrasi **secara berurutan**:
+
+1. `supabase/migrations/20260925000000_init.sql` membuat semua tabel, trigger, aturan RLS, dan bucket `news-images`.
+2. `supabase/migrations/20260926000000_genz_refresh.sql` menambahkan fungsi waktu baca, view `trending_tags`, dan warna kategori baru. Jalankan **setelah** `seed.sql` bila kamu memakai data contoh, supaya warna kategorinya ikut diperbarui.
 
 ### 2. Atur login
 
@@ -64,11 +68,12 @@ supabase/
   seed.sql           data contoh
 src/
   app/
-    (public)/        beranda, /berita/[slug], /kategori/[slug] (ISR)
+    (public)/        beranda, /berita/[slug], /kategori/[slug], /tag/[slug] (ISR)
     masuk/           halaman dan action login
     dashboard/       halaman redaksi dan server action
   components/
-    news/            komponen tampilan berita
+    news/            komponen tampilan berita (poster, stiker, jalur terkini, baris swipe)
+    article/         bar progres baca dan tombol bagikan
     dashboard/       formulir berita dan pengunggah foto
     site/            header dan footer
     motion/          animasi GSAP dan smooth scroll Lenis
@@ -95,6 +100,8 @@ auth.users 1──1 profiles 1──* articles *──1 categories
                    └──* media (pengunggah)
 ```
 
+Waktu baca (`reading_minutes`) dan tag yang sedang ramai (`trending_tags`) dihitung saat dibaca, bukan disimpan sebagai kolom, jadi tidak ada data ganda yang bisa tidak sinkron.
+
 Semua tabel sudah dalam bentuk normal ketiga: kategori, tag, gambar, dan penulis disimpan di tabelnya sendiri dan dirujuk lewat foreign key. Tanggal terbit dan `updated_at` diisi otomatis oleh trigger.
 
 ## Tentang unggah gambar
@@ -111,5 +118,12 @@ Bucket dibatasi 2 MB dan hanya menerima WebP/JPEG, jadi file mentah yang lolos d
 ## Pengembangan berikutnya
 
 - Galeri foto di dalam berita: tambah tabel `article_media (article_id, media_id, position)`.
-- Halaman tag dan pencarian.
+- Pencarian berita.
 - Tipe database otomatis: `npx supabase gen types typescript --project-id <id> > src/types/supabase.ts`, lalu pakai sebagai generic di client Supabase.
+
+## Identitas visual
+
+- **Jalur kota:** setiap kategori punya warna jalur sendiri (seperti rute angkot/transit), dipakai di garis header, halte "Terkini", dan blok poster.
+- **Stiker:** kategori, hashtag, logo, dan tombol Bagikan tampil sebagai stiker bergaris tebal yang sedikit miring. Warna teks di atas warna kategori dipilih otomatis agar kontrasnya terbaca (`lib/color.ts`).
+- **Huruf:** Bricolage Grotesque versi padat untuk judul, Plus Jakarta Sans untuk teks.
+- **Gerak:** hanya satu animasi otomatis (poster muncul saat beranda dibuka). Semua animasi mati bila perangkat memakai pengaturan "kurangi gerakan".

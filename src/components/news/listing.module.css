@@ -1,0 +1,31 @@
+.hero {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-5) var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--route);
+  color: var(--on-route);
+}
+
+.title {
+  font-size: clamp(3rem, 1.6rem + 7vw, 8rem);
+  font-variation-settings: "wdth" 75;
+  font-weight: 800;
+  line-height: 0.88;
+  overflow-wrap: anywhere;
+}
+
+.description {
+  font-size: var(--step-1);
+  font-weight: 600;
+}
+
+.listing {
+  display: grid;
+  gap: var(--space-5);
+  padding-top: var(--space-4);
+}
+
+.empty {
+  color: var(--muted);
+}

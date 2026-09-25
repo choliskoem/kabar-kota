@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { ListingHero } from "@/components/news/ListingHero";
 import { StoryItem } from "@/components/news/StoryItem";
-import { routeStyle } from "@/components/news/route-style";
 import { getArticlesByCategory, getCategories, getCategoryBySlug } from "@/services/articles";
-import styles from "./category.module.css";
+import newsStyles from "@/components/news/news.module.css";
+import styles from "@/components/news/listing.module.css";
 
 export const revalidate = 120;
 
@@ -22,19 +23,22 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
 }
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
-  const { slug } = await params;
-  const category = await getCategoryBySlug(slug);
+  const category = await getCategoryBySlug((await params).slug);
   if (!category) notFound();
 
-  const articles = await getArticlesByCategory(slug, 30);
+  const articles = await getArticlesByCategory(category.id, 30);
 
   return (
-    <div className={`page ${styles.page}`} style={routeStyle(category.color)}>
-      <h1 className={styles.title}>{category.name}</h1>
+    <div className={`page ${styles.listing}`}>
+      <ListingHero
+        title={category.name}
+        description={`${articles.length} berita ${category.name.toLowerCase()} terbaru`}
+        color={category.color}
+      />
       {articles.length === 0 ? (
-        <p>Belum ada berita {category.name.toLowerCase()} yang terbit.</p>
+        <p className={styles.empty}>Belum ada berita {category.name.toLowerCase()} yang terbit.</p>
       ) : (
-        <div className={styles.grid}>
+        <div className={newsStyles.grid}>
           {articles.map((article) => (
             <StoryItem key={article.id} article={article} />
           ))}
