@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ListenToArticle } from "@/components/article/ListenToArticle";
+import { ReactionBar } from "@/components/article/ReactionBar";
 import { ReadingProgress } from "@/components/article/ReadingProgress";
 import { ShareButton } from "@/components/article/ShareButton";
 import { CategoryLabel } from "@/components/news/CategoryLabel";
@@ -10,11 +11,13 @@ import { StoryItem } from "@/components/news/StoryItem";
 import { routeStyle } from "@/components/news/route-style";
 import { formatDate, formatReadingTime, formatTime, splitParagraphs } from "@/lib/format";
 import { resolveCoverImage } from "@/lib/cover-image";
+import { emptyReactionCounts } from "@/lib/reactions";
 import {
   getArticlesByCategory,
   getPublishedArticleBySlug,
   getRecentSlugs,
 } from "@/services/articles";
+import { getReactionCounts } from "@/services/reactions";
 import newsStyles from "@/components/news/news.module.css";
 import styles from "@/components/article/article.module.css";
 
@@ -32,10 +35,10 @@ export async function generateStaticParams() {
   return slugs.map((slug) => ({ slug }));
 }
 
+/** Gambar pratinjau dibuat otomatis oleh opengraph-image.tsx di folder yang sama. */
 export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
   const article = await getPublishedArticleBySlug((await params).slug);
   if (!article) return {};
-  const cover = resolveCoverImage(article, "large");
 
   return {
     title: article.title,
@@ -45,8 +48,8 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
       description: article.excerpt,
       type: "article",
       publishedTime: article.publishedAt ?? undefined,
-      images: cover ? [cover.src] : undefined,
     },
+    twitter: { card: "summary_large_image" },
   };
 }
 
@@ -54,9 +57,12 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   const article = await getPublishedArticleBySlug((await params).slug);
   if (!article) notFound();
 
-  const related = (await getArticlesByCategory(article.category.id, RELATED_COUNT + 1))
-    .filter(({ id }) => id !== article.id)
-    .slice(0, RELATED_COUNT);
+  const [sameCategory, reactionCounts] = await Promise.all([
+    getArticlesByCategory(article.category.id, RELATED_COUNT + 1),
+    // Reaksi bukan bagian inti berita: bila gagal dimuat, halaman tetap tampil dengan hitungan nol.
+    getReactionCounts(article.id).catch(() => emptyReactionCounts()),
+  ]);
+  const related = sameCategory.filter(({ id }) => id !== article.id).slice(0, RELATED_COUNT);
   const path = `/berita/${article.slug}`;
   const cover = resolveCoverImage(article, "large");
   const paragraphs = splitParagraphs(article.body);
@@ -114,6 +120,8 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             </p>
           ))}
         </div>
+
+        <ReactionBar articleId={article.id} initialCounts={reactionCounts} />
 
         {article.tags.length > 0 && (
           <ul className={styles.tags} aria-label="Tag">

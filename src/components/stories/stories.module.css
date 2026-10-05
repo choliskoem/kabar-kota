@@ -1,0 +1,383 @@
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* =====================================================================
+   Deretan lingkaran di beranda
+   ===================================================================== */
+.strip {
+  margin-inline: calc(-1 * var(--gutter));
+  padding-inline: var(--gutter);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.circles {
+  display: flex;
+  gap: var(--space-3);
+  margin: 0;
+  padding: var(--space-1) 0 var(--space-2);
+  list-style: none;
+}
+
+.circle {
+  display: grid;
+  justify-items: center;
+  gap: 0.35rem;
+  width: 4.75rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+/* Cincin warna kategori + stabilo; abu-abu bila semua story sudah dilihat */
+.ring {
+  display: grid;
+  place-items: center;
+  width: 4.5rem;
+  height: 4.5rem;
+  padding: 3px;
+  border-radius: 50%;
+  background: conic-gradient(from 200deg, var(--route), var(--stabilo), var(--route));
+  transition: transform var(--duration) var(--ease-spring);
+}
+
+.circle[data-seen] .ring {
+  background: var(--line);
+}
+
+.ringImage,
+.ringFallback {
+  width: 100%;
+  height: 100%;
+  border: 3px solid var(--paper);
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.ringFallback {
+  display: grid;
+  place-items: center;
+  background: var(--route);
+  color: var(--on-route);
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  font-weight: 800;
+}
+
+.circleLabel {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.circle[data-seen] .circleLabel {
+  color: var(--muted);
+}
+
+.circle:hover .ring {
+  transform: scale(1.06) rotate(-4deg);
+}
+
+.circle:active .ring {
+  transform: scale(0.92);
+}
+
+/* =====================================================================
+   Penampil layar penuh
+   ===================================================================== */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  background: rgb(10 12 22 / 0.94);
+  animation: overlay-in 0.25s var(--ease-out);
+}
+
+.frame {
+  position: relative;
+  width: min(100vw, calc(min(92vh, 860px) * 9 / 16));
+  aspect-ratio: 9 / 16;
+  overflow: hidden;
+  border-radius: 18px;
+  background: var(--route);
+  color: #ffffff;
+  animation: frame-in 0.35s var(--ease-out);
+}
+
+.image,
+.imageFallback {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: fade-in 0.35s ease;
+}
+
+.imageFallback {
+  background: radial-gradient(circle at 30% 20%, var(--route), #15182b 75%);
+}
+
+.preload {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgb(0 0 0 / 0.55) 0%,
+    transparent 22%,
+    transparent 42%,
+    rgb(0 0 0 / 0.88) 100%
+  );
+}
+
+/* Area ketuk di seluruh bingkai; tombol & tautan berada di atasnya */
+.tapZone {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.top {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 2;
+  padding: 0.75rem 0.75rem 0;
+  pointer-events: none;
+}
+
+.progress {
+  display: flex;
+  gap: 4px;
+}
+
+.progressTrack {
+  position: relative;
+  flex: 1;
+  height: 3px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: rgb(255 255 255 / 0.35);
+}
+
+.progressDone,
+.progressFill {
+  position: absolute;
+  inset: 0;
+  background: #ffffff;
+}
+
+.progressFill {
+  transform-origin: left center;
+  animation: story-progress var(--story-duration) linear forwards;
+}
+
+/* Bar progres adalah penunjuk waktu, bukan hiasan: durasinya tetap walau gerak dikurangi */
+@media (prefers-reduced-motion: reduce) {
+  .progressFill {
+    animation-duration: var(--story-duration) !important;
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.7rem;
+}
+
+.sticker {
+  padding: 0.2rem 0.7rem;
+  border: 2px solid #15182b;
+  border-radius: 999px;
+  background: var(--route);
+  color: var(--on-route);
+  box-shadow: 2px 2px 0 #15182b;
+  font-family: var(--font-display);
+  font-size: var(--step--1);
+  font-weight: 800;
+  transform: rotate(-2deg);
+}
+
+.time {
+  color: rgb(255 255 255 / 0.85);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.controls {
+  display: flex;
+  gap: 0.4rem;
+  margin-left: auto;
+}
+
+.iconButton {
+  min-height: 2.25rem;
+  padding: 0.3rem 0.8rem;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.18);
+  color: #ffffff;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  cursor: pointer;
+  pointer-events: auto;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.iconButton:hover {
+  background: rgb(255 255 255 / 0.3);
+}
+
+.content {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 2;
+  display: grid;
+  justify-items: start;
+  gap: 0.6rem;
+  padding: 1.25rem 1.25rem 1.75rem;
+  pointer-events: none;
+  animation: content-in 0.4s var(--ease-out);
+}
+
+.counter {
+  color: rgb(255 255 255 / 0.75);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.title {
+  font-size: clamp(1.75rem, 1.3rem + 2vw, 2.3rem);
+  font-variation-settings: "wdth" 75;
+  font-weight: 800;
+  line-height: 1;
+  text-wrap: balance;
+}
+
+.excerpt {
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+  padding: 0.6rem 1.1rem;
+  border: 2px solid #15182b;
+  border-radius: 999px;
+  background: var(--stabilo);
+  color: #15182b;
+  box-shadow: 3px 3px 0 #15182b;
+  font-family: var(--font-display);
+  font-weight: 800;
+  text-decoration: none;
+  pointer-events: auto;
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.cta:hover {
+  transform: translate(-2px, -2px);
+}
+
+.cta:active {
+  transform: translate(2px, 2px);
+}
+
+.sideButton {
+  display: grid;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.14);
+  color: #ffffff;
+  font-size: 2rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.sideButton:hover {
+  background: rgb(255 255 255 / 0.28);
+}
+
+@keyframes story-progress {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@keyframes overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes frame-in {
+  from { opacity: 0; transform: scale(0.94); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes content-in {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* HP: story memenuhi layar, tombol samping disembunyikan (cukup ketuk) */
+@media (max-width: 600px) {
+  .overlay {
+    gap: 0;
+  }
+
+  .frame {
+    width: 100vw;
+    height: 100dvh;
+    aspect-ratio: auto;
+    border-radius: 0;
+  }
+
+  .sideButton {
+    display: none;
+  }
+
+  .top {
+    padding-top: calc(0.75rem + env(safe-area-inset-top));
+  }
+
+  .content {
+    padding-bottom: calc(1.75rem + env(safe-area-inset-bottom));
+  }
+}

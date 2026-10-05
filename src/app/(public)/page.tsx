@@ -3,15 +3,18 @@ import { CategoryRail } from "@/components/news/CategoryRail";
 import { LatestLine } from "@/components/news/LatestLine";
 import { PosterStory } from "@/components/news/PosterStory";
 import { TrendingTags } from "@/components/news/TrendingTags";
+import { StoryStrip } from "@/components/stories/StoryStrip";
 import { groupByCategory } from "@/lib/news";
+import { buildStoryGroups } from "@/lib/stories";
 import { getCategories, getLatestArticles, getTrendingTags } from "@/services/articles";
 import styles from "./home.module.css";
 
 export const revalidate = 60;
 
 const LATEST_COUNT = 10;
-const STORIES_PER_CATEGORY = 3;
+const RAIL_ITEMS_PER_CATEGORY = 3;
 const TRENDING_COUNT = 10;
+const STORIES_PER_GROUP = 5;
 
 export default async function HomePage() {
   const [articles, categories, trendingTags] = await Promise.all([
@@ -31,11 +34,13 @@ export default async function HomePage() {
   }
 
   const [lead, ...others] = articles;
-  const sections = groupByCategory(others, categories, STORIES_PER_CATEGORY);
+  const sections = groupByCategory(others, categories, RAIL_ITEMS_PER_CATEGORY);
+  const storyGroups = buildStoryGroups(groupByCategory(articles, categories, STORIES_PER_GROUP));
 
   return (
     <div className={`page ${styles.home}`}>
       <div className={styles.front}>
+        <StoryStrip groups={storyGroups} />
         <PosterStory article={lead} />
         <div className={styles.side}>
           <LatestLine articles={others.slice(0, LATEST_COUNT)} />

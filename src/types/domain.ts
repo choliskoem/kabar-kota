@@ -53,3 +53,8 @@ export interface Article extends ArticleSummary {
   body: string;
   tags: Tag[];
 }
+
+
+export type ReactionKind = "fire" | "wow" | "haha" | "sad" | "angry";
+
+export type ReactionCounts = Record<ReactionKind, number>;

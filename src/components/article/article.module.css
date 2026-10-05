@@ -382,3 +382,126 @@
   from { transform: translateY(100%); }
   to { transform: translateY(0); }
 }
+/* ---------- Reaksi emoji ---------- */
+.reactions {
+  display: grid;
+  gap: var(--space-3);
+  max-width: 38rem;
+  padding: var(--space-4);
+  border: 3px solid var(--ink);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: 5px 5px 0 var(--ink);
+}
+
+.reactionsHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.reactionsTitle {
+  font-size: var(--step-2);
+  font-weight: 800;
+}
+
+.reactionsTotal {
+  color: var(--muted);
+  font-size: var(--step--1);
+  font-weight: 600;
+}
+
+.reactionList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.reaction {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2.9rem;
+  padding: 0.4rem 0.9rem 0.4rem 0.7rem;
+  border: 2px solid var(--line);
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: border-color var(--duration-fast) ease, background-color var(--duration-fast) ease,
+    transform var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) ease;
+}
+
+.reaction:hover {
+  border-color: var(--ink);
+  transform: translateY(-2px);
+}
+
+.reaction:active {
+  transform: scale(0.94);
+}
+
+.reaction[aria-pressed="true"] {
+  border-color: var(--ink);
+  background: var(--route, var(--stabilo));
+  color: var(--on-route, #15182b);
+  box-shadow: 3px 3px 0 var(--ink);
+}
+
+.reactionEmoji {
+  font-size: 1.45rem;
+  line-height: 1;
+  transition: transform var(--duration) var(--ease-spring);
+}
+
+.reaction:hover .reactionEmoji {
+  transform: scale(1.2) rotate(-8deg);
+}
+
+.reaction[aria-pressed="true"] .reactionEmoji {
+  animation: reaction-pop 0.45s var(--ease-spring);
+}
+
+.reactionError {
+  color: var(--danger);
+  font-size: var(--step--1);
+  font-weight: 700;
+}
+
+/* Emoji "meletup" ke beberapa arah saat dipilih */
+.burst {
+  position: absolute;
+  top: 50%;
+  left: 1.4rem;
+  pointer-events: none;
+}
+
+.burst span {
+  position: absolute;
+  font-size: 1.1rem;
+  opacity: 0;
+  animation: reaction-burst 0.75s var(--ease-out) forwards;
+  rotate: calc(var(--i) * 60deg);
+}
+
+@keyframes reaction-pop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.5) rotate(-12deg); }
+  100% { transform: scale(1); }
+}
+
+@keyframes reaction-burst {
+  0% { opacity: 1; transform: translate(-50%, -50%) translateY(0) scale(0.6); }
+  100% { opacity: 0; transform: translate(-50%, -50%) translateY(-2.6rem) scale(1.1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .burst {
+    display: none;
+  }
+}

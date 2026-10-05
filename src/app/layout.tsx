@@ -20,6 +20,7 @@ const body = Plus_Jakarta_Sans({
 export const metadata: Metadata = {
   title: { default: siteConfig.name, template: `%s | ${siteConfig.name}` },
   description: siteConfig.description,
+  twitter: { card: "summary_large_image" },
 };
 
 export const viewport: Viewport = {
