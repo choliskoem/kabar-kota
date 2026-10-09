@@ -1,6 +1,6 @@
-import type { ArticleInput } from "@/validation/article";
+import type { ArticleField } from "@/validation/article";
 
-export type ArticleField = keyof ArticleInput;
+export type { ArticleField };
 
 export interface ArticleFormState {
   message: string | null;

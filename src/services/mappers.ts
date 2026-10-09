@@ -1,16 +1,21 @@
 import type {
   ArticleRow,
   ArticleSummaryRow,
+  ArticleWithHighlightsRow,
   CategoryRow,
+  HighlightRow,
   MediaRow,
+  PollRow,
   ProfileRow,
   TrendingTagRow,
 } from "@/types/database-rows";
 import type {
   Article,
   ArticleSummary,
+  ArticleWithHighlights,
   Category,
   Media,
+  Poll,
   Profile,
   TrendingTag,
 } from "@/types/domain";
@@ -26,10 +31,18 @@ export const ARTICLE_SUMMARY_COLUMNS = `
   author:profiles(full_name)
 `;
 
-export const ARTICLE_COLUMNS = `
+export const HIGHLIGHT_COLUMNS = "highlights:article_highlights(position, content)";
+
+export const ARTICLE_WITH_HIGHLIGHTS_COLUMNS = `
   ${ARTICLE_SUMMARY_COLUMNS},
+  ${HIGHLIGHT_COLUMNS}
+`;
+
+export const ARTICLE_COLUMNS = `
+  ${ARTICLE_WITH_HIGHLIGHTS_COLUMNS},
   body,
-  tags:article_tags(tag:tags(id, name, slug))
+  tags:article_tags(tag:tags(id, name, slug)),
+  poll:polls(id, question, options:poll_options(id, position, label))
 `;
 
 export function toProfile(row: ProfileRow): Profile {
@@ -73,10 +86,29 @@ export function toTrendingTag(row: TrendingTagRow): TrendingTag {
   return { id: row.id, name: row.name, slug: row.slug, articleCount: row.article_count };
 }
 
+const byPosition = (a: { position: number }, b: { position: number }) => a.position - b.position;
+
+export function toHighlights(rows: HighlightRow[]): string[] {
+  return [...rows].sort(byPosition).map(({ content }) => content);
+}
+
+export function toPoll(row: PollRow): Poll {
+  return {
+    id: row.id,
+    question: row.question,
+    options: [...row.options].sort(byPosition).map(({ id, label }) => ({ id, label })),
+  };
+}
+
+export function toArticleWithHighlights(row: ArticleWithHighlightsRow): ArticleWithHighlights {
+  return { ...toArticleSummary(row), highlights: toHighlights(row.highlights) };
+}
+
 export function toArticle(row: ArticleRow): Article {
   return {
-    ...toArticleSummary(row),
+    ...toArticleWithHighlights(row),
     body: row.body,
     tags: row.tags.map(({ tag }) => tag),
+    poll: row.poll ? toPoll(row.poll) : null,
   };
 }

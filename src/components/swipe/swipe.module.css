@@ -1,0 +1,320 @@
+/* =====================================================================
+   Mode swipe: kartu berita layar penuh yang digulir satu per satu.
+   Di HP memenuhi layar; di desktop tampil sebagai kolom 9:16 di tengah.
+   ===================================================================== */
+.screen {
+  position: fixed;
+  inset: 0;
+  background: #0b0d16;
+  color: #ffffff;
+}
+
+.topbar {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: min(100%, 30rem);
+  margin-inline: auto;
+  padding: calc(0.75rem + env(safe-area-inset-top)) 1rem 0.75rem;
+  background: linear-gradient(to bottom, rgb(0 0 0 / 0.55), transparent);
+  pointer-events: none;
+}
+
+.topbar a {
+  pointer-events: auto;
+}
+
+.brand {
+  padding: 0.1rem 0.6rem 0.2rem;
+  border: 2px solid #15182b;
+  border-radius: 8px;
+  background: var(--stabilo);
+  color: #15182b;
+  box-shadow: 2px 2px 0 #15182b;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-variation-settings: "wdth" 75;
+  font-weight: 800;
+  text-decoration: none;
+  transform: rotate(-2deg);
+}
+
+.counter {
+  font-size: var(--step--1);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.close {
+  margin-left: auto;
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.18);
+  color: #ffffff;
+  font-size: var(--step--1);
+  font-weight: 700;
+  text-decoration: none;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.feed {
+  height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+}
+
+.feed:focus {
+  outline: none;
+}
+
+.card {
+  position: relative;
+  display: grid;
+  align-content: end;
+  width: min(100%, 30rem);
+  height: 100dvh;
+  margin-inline: auto;
+  overflow: hidden;
+  background: var(--route, #15182b);
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+.image {
+  object-fit: cover;
+}
+
+.imageFallback {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 30% 20%, var(--route), #15182b 75%);
+}
+
+.shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 30%, rgb(0 0 0 / 0.55) 55%, rgb(0 0 0 / 0.92) 100%);
+}
+
+.content {
+  position: relative;
+  display: grid;
+  justify-items: start;
+  gap: 0.75rem;
+  padding: 1.25rem 1.25rem calc(1.75rem + env(safe-area-inset-bottom));
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  color: rgb(255 255 255 / 0.85);
+  font-size: var(--step--1);
+  font-weight: 600;
+}
+
+.sticker {
+  padding: 0.15rem 0.7rem;
+  border: 2px solid #15182b;
+  border-radius: 999px;
+  background: var(--route);
+  color: var(--on-route);
+  box-shadow: 2px 2px 0 #15182b;
+  font-family: var(--font-display);
+  font-weight: 800;
+  transform: rotate(-2deg);
+}
+
+.title {
+  font-size: clamp(1.9rem, 1.4rem + 2.2vw, 2.4rem);
+  font-variation-settings: "wdth" 75;
+  font-weight: 800;
+  line-height: 0.98;
+  text-wrap: balance;
+}
+
+.highlights {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.highlights li {
+  position: relative;
+  padding-left: 1.4rem;
+  font-size: 0.98rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.highlights li::before {
+  content: "";
+  position: absolute;
+  top: 0.45rem;
+  left: 0.15rem;
+  width: 0.6rem;
+  height: 0.6rem;
+  border: 2px solid #15182b;
+  border-radius: 50%;
+  background: var(--stabilo);
+}
+
+.excerpt {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.25rem;
+}
+
+.readLink,
+.secondaryLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 2.75rem;
+  padding: 0.55rem 1.1rem;
+  border: 2px solid #15182b;
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.readLink {
+  background: #ffffff;
+  color: #15182b;
+  box-shadow: 3px 3px 0 #15182b;
+}
+
+.secondaryLink {
+  border-color: rgb(255 255 255 / 0.5);
+  background: transparent;
+  color: #ffffff;
+}
+
+.readLink:hover {
+  transform: translate(-2px, -2px);
+}
+
+.readLink:active,
+.secondaryLink:active {
+  transform: scale(0.96);
+}
+
+/* Petunjuk geser di kartu pertama */
+.hint {
+  position: absolute;
+  top: 38%;
+  left: 50%;
+  display: grid;
+  justify-items: center;
+  gap: 0.2rem;
+  padding: 0.6rem 1rem;
+  border-radius: 14px;
+  background: rgb(0 0 0 / 0.45);
+  font-weight: 800;
+  transform: translateX(-50%);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.hintArrow {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+/* Kartu penutup */
+.endCard {
+  align-content: center;
+  justify-items: center;
+  gap: var(--space-3);
+  padding: 2rem;
+  background: #15182b;
+  text-align: center;
+}
+
+.endEmoji {
+  font-size: 3.5rem;
+}
+
+.endTitle {
+  max-width: 18ch;
+  font-size: var(--step-3);
+  font-weight: 800;
+}
+
+.endCard .actions {
+  justify-content: center;
+}
+
+.empty {
+  display: grid;
+  place-content: center;
+  gap: var(--space-3);
+  min-height: 100dvh;
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hintArrow {
+    animation: hint-bounce 1.2s var(--ease-out) infinite;
+  }
+
+  /*
+   * Isi kartu muncul saat kartu masuk layar. Waktunya diukur dari posisi kartu
+   * (bukan posisi blok teks), jadi animasi selesai tepat saat kartu pas di layar.
+   */
+  @supports (animation-timeline: view()) {
+    .card {
+      view-timeline: --swipe-card block;
+    }
+
+    .content {
+      animation: card-content-in linear both;
+      animation-timeline: --swipe-card;
+      animation-range: entry 40% entry 100%;
+    }
+  }
+}
+
+@keyframes hint-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes card-content-in {
+  from { opacity: 0; transform: translateY(32px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Desktop: kolom di tengah dengan sudut membulat */
+@media (min-width: 600px) {
+  .card {
+    height: calc(100dvh - 2rem);
+    margin-block: 1rem;
+    border-radius: 18px;
+    scroll-margin-block: 1rem;
+  }
+
+  .topbar {
+    padding-top: 1.5rem;
+  }
+}

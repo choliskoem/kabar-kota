@@ -3,17 +3,27 @@ import { createPublicSupabase } from "@/lib/supabase/public";
 import type {
   ArticleRow,
   ArticleSummaryRow,
+  ArticleWithHighlightsRow,
   CategoryRow,
   TagRow,
   TrendingTagRow,
 } from "@/types/database-rows";
-import type { Article, ArticleSummary, Category, Tag, TrendingTag } from "@/types/domain";
+import type {
+  Article,
+  ArticleSummary,
+  ArticleWithHighlights,
+  Category,
+  Tag,
+  TrendingTag,
+} from "@/types/domain";
 import {
   ARTICLE_COLUMNS,
   ARTICLE_SUMMARY_COLUMNS,
+  ARTICLE_WITH_HIGHLIGHTS_COLUMNS,
   CATEGORY_COLUMNS,
   toArticle,
   toArticleSummary,
+  toArticleWithHighlights,
   toCategory,
   toTrendingTag,
 } from "@/services/mappers";
@@ -123,6 +133,19 @@ export async function getPublishedArticleBySlug(slug: string): Promise<Article |
 
   if (error) throw new Error(`Gagal memuat berita: ${error.message}`);
   return data ? toArticle(data as unknown as ArticleRow) : null;
+}
+
+/** Berita terbaru beserta poin TL;DR-nya untuk mode swipe. */
+export async function getSwipeFeed(limit: number): Promise<ArticleWithHighlights[]> {
+  const { data, error } = await createPublicSupabase()
+    .from("articles")
+    .select(ARTICLE_WITH_HIGHLIGHTS_COLUMNS)
+    .eq("status", "published")
+    .order("published_at", { ascending: false })
+    .limit(limit);
+
+  if (error) throw new Error(`Gagal memuat berita swipe: ${error.message}`);
+  return (data as unknown as ArticleWithHighlightsRow[]).map(toArticleWithHighlights);
 }
 
 export async function getRecentSlugs(limit: number): Promise<string[]> {

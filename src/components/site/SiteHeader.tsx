@@ -11,6 +11,11 @@ export function SiteHeader({ categories }: { categories: Category[] }) {
         <Logo categories={categories} />
         <nav aria-label="Kategori berita" className={styles.nav}>
           <ul>
+            <li>
+              <Link href="/swipe" className={styles.swipeLink}>
+                <span aria-hidden="true">⚡</span> Mode swipe
+              </Link>
+            </li>
             {categories.map((category) => (
               <li key={category.id} style={routeStyle(category.color)}>
                 <Link href={`/kategori/${category.slug}`}>{category.name}</Link>

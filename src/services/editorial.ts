@@ -10,7 +10,7 @@ import {
 } from "@/services/mappers";
 import type { ArticleRow, ArticleSummaryRow } from "@/types/database-rows";
 import type { Article, ArticleStatus, ArticleSummary, Profile } from "@/types/domain";
-import type { ArticleInput } from "@/validation/article";
+import type { ArticleInput, PollInput } from "@/validation/article";
 
 type ServerSupabase = Awaited<ReturnType<typeof createServerSupabase>>;
 
@@ -92,7 +92,11 @@ export async function saveArticle(input: ArticleInput, author: Profile): Promise
     : await insertArticle(supabase, { ...fields, slug: createArticleSlug(input.title), author_id: author.id });
 
   const tagIds = await resolveTagIds(supabase, input.tags);
-  await replaceArticleTags(supabase, articleId, tagIds);
+  await Promise.all([
+    replaceArticleTags(supabase, articleId, tagIds),
+    replaceHighlights(supabase, articleId, input.highlights),
+    syncPoll(supabase, articleId, input.poll),
+  ]);
 }
 
 export async function changeArticleStatus(id: string, status: ArticleStatus): Promise<void> {
@@ -175,4 +179,73 @@ async function replaceArticleTags(
     .from("article_tags")
     .insert(tagIds.map((tagId) => ({ article_id: articleId, tag_id: tagId })));
   if (error) throw new Error(`Gagal memperbarui tag artikel: ${error.message}`);
+}
+
+async function replaceHighlights(
+  supabase: ServerSupabase,
+  articleId: string,
+  highlights: string[],
+): Promise<void> {
+  const { error: deleteError } = await supabase
+    .from("article_highlights")
+    .delete()
+    .eq("article_id", articleId);
+  if (deleteError) throw new Error(`Gagal memperbarui TL;DR: ${deleteError.message}`);
+
+  if (highlights.length === 0) return;
+
+  const { error } = await supabase
+    .from("article_highlights")
+    .insert(highlights.map((content, index) => ({ article_id: articleId, position: index + 1, content })));
+  if (error) throw new Error(`Gagal memperbarui TL;DR: ${error.message}`);
+}
+
+interface StoredPoll {
+  id: string;
+  question: string;
+  options: { position: number; label: string }[];
+}
+
+function isSamePoll(stored: StoredPoll, input: PollInput): boolean {
+  const storedLabels = [...stored.options].sort((a, b) => a.position - b.position).map(({ label }) => label);
+  return (
+    stored.question === input.question &&
+    storedLabels.length === input.options.length &&
+    storedLabels.every((label, index) => label === input.options[index])
+  );
+}
+
+/**
+ * Polling yang tidak berubah dibiarkan (suaranya tetap). Bila pertanyaan atau pilihan
+ * diubah, polling lama dihapus beserta suaranya lalu dibuat ulang, supaya suara lama
+ * tidak menempel ke pilihan yang artinya sudah berbeda.
+ */
+async function syncPoll(supabase: ServerSupabase, articleId: string, input: PollInput | null): Promise<void> {
+  const { data, error } = await supabase
+    .from("polls")
+    .select("id, question, options:poll_options(position, label)")
+    .eq("article_id", articleId)
+    .maybeSingle();
+  if (error) throw new Error(`Gagal memuat polling: ${error.message}`);
+
+  const stored = data as StoredPoll | null;
+  if (stored && input && isSamePoll(stored, input)) return;
+
+  if (stored) {
+    const { error: deleteError } = await supabase.from("polls").delete().eq("id", stored.id);
+    if (deleteError) throw new Error(`Gagal memperbarui polling: ${deleteError.message}`);
+  }
+  if (!input) return;
+
+  const { data: poll, error: pollError } = await supabase
+    .from("polls")
+    .insert({ article_id: articleId, question: input.question })
+    .select("id")
+    .single();
+  if (pollError) throw new Error(`Gagal menyimpan polling: ${pollError.message}`);
+
+  const { error: optionsError } = await supabase.from("poll_options").insert(
+    input.options.map((label, index) => ({ poll_id: (poll as { id: string }).id, position: index + 1, label })),
+  );
+  if (optionsError) throw new Error(`Gagal menyimpan pilihan polling: ${optionsError.message}`);
 }

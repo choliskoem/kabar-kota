@@ -49,11 +49,30 @@ export interface ArticleSummary {
   readingMinutes: number;
 }
 
-export interface Article extends ArticleSummary {
-  body: string;
-  tags: Tag[];
+export interface PollOption {
+  id: number;
+  label: string;
 }
 
+export interface Poll {
+  id: string;
+  question: string;
+  options: PollOption[];
+}
+
+/** Jumlah suara per id pilihan polling. */
+export type PollVotes = Record<number, number>;
+
+/** Ringkasan berita ditambah poin TL;DR, dipakai di mode swipe. */
+export interface ArticleWithHighlights extends ArticleSummary {
+  highlights: string[];
+}
+
+export interface Article extends ArticleWithHighlights {
+  body: string;
+  tags: Tag[];
+  poll: Poll | null;
+}
 
 export type ReactionKind = "fire" | "wow" | "haha" | "sad" | "angry";
 

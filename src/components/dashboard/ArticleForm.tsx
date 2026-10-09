@@ -5,7 +5,8 @@ import { saveArticleAction } from "@/app/dashboard/actions";
 import { countWords, estimateReadingMinutes, toHashtag } from "@/lib/format";
 import { statusHint } from "@/lib/labels";
 import type { Article, ArticleStatus, Category, Media } from "@/types/domain";
-import { initialArticleFormState } from "@/validation/article-form-state";
+import { HIGHLIGHT_MAX, POLL_OPTION_MAX, POLL_QUESTION_MAX } from "@/validation/article";
+import { initialArticleFormState, type ArticleField } from "@/validation/article-form-state";
 import { routeStyle } from "@/components/news/route-style";
 import { FormField, describedBy } from "./FormField";
 import { ImageUploader } from "./ImageUploader";
@@ -17,6 +18,13 @@ import styles from "./dashboard.module.css";
 const TITLE_MAX = 160;
 const EXCERPT_MAX = 300;
 const TAG_MAX = 8;
+const HIGHLIGHT_FIELDS = ["highlight1", "highlight2", "highlight3"] as const;
+const POLL_OPTION_FIELDS = ["pollOption1", "pollOption2", "pollOption3", "pollOption4"] as const;
+
+/** Mengisi array sampai panjang tertentu dengan string kosong (untuk nilai awal isian). */
+function padTo(values: string[], length: number): string[] {
+  return Array.from({ length }, (_, index) => values[index] ?? "");
+}
 
 interface ArticleFormProps {
   categories: Category[];
@@ -66,7 +74,7 @@ function preventEnterSubmit(event: KeyboardEvent<HTMLFormElement>) {
 
 function bodyHint(body: string): string {
   const words = countWords(body);
-    const paragraphHint = "Tekan Enter untuk membuat paragraf baru.";
+  const paragraphHint = "Tekan Enter untuk membuat paragraf baru.";
   if (words === 0) return paragraphHint;
   return `${words} kata, sekitar ${estimateReadingMinutes(body)} menit baca. ${paragraphHint}`;
 }
@@ -80,11 +88,26 @@ export function ArticleForm({ categories, canPublish, article }: ArticleFormProp
   const [categoryId, setCategoryId] = useState(article ? String(article.category.id) : "");
   const [tags, setTags] = useState(article?.tags.map((tag) => tag.name).join(", ") ?? "");
   const [cover, setCover] = useState<Media | null>(article?.cover ?? null);
+  const [highlights, setHighlights] = useState(() => padTo(article?.highlights ?? [], HIGHLIGHT_FIELDS.length));
+  const [pollQuestion, setPollQuestion] = useState(article?.poll?.question ?? "");
+  const [pollOptions, setPollOptions] = useState(() =>
+    padTo(article?.poll?.options.map(({ label }) => label) ?? [], POLL_OPTION_FIELDS.length),
+  );
   const [isDirty, setIsDirty] = useState(false);
 
   useUnsavedChangesWarning(isDirty && !isPending);
 
   const errors = state.fieldErrors;
+  const hasStoredPoll = Boolean(article?.poll);
+
+  function updateAt(values: string[], index: number, value: string): string[] {
+    return values.map((current, position) => (position === index ? value : current));
+  }
+
+  function errorFor(fields: readonly ArticleField[]): string | undefined {
+    return fields.map((field) => errors[field]).find(Boolean);
+  }
+
   const tagNames = parseTags(tags);
   const [primary, secondary] = submitOptions(canPublish, article?.status);
 
@@ -140,6 +163,32 @@ export function ArticleForm({ categories, canPublish, article }: ArticleFormProp
             aria-describedby={describedBy("excerpt", errors.excerpt, true)}
           />
         </FormField>
+
+        <fieldset className={styles.tldr} aria-describedby="tldr-hint">
+          <legend>Intinya (TL;DR)</legend>
+          <p id="tldr-hint" className={styles.hint}>
+            Maksimal 3 poin singkat yang tampil di atas berita dan di mode swipe. Boleh dikosongkan.
+          </p>
+          {HIGHLIGHT_FIELDS.map((field, index) => (
+            <FormField
+              key={field}
+              id={field}
+              label={`Poin ${index + 1}`}
+              error={errors[field]}
+              counter={{ current: highlights[index].length, max: HIGHLIGHT_MAX }}
+            >
+              <input
+                id={field}
+                name={field}
+                value={highlights[index]}
+                onChange={(event) => setHighlights(updateAt(highlights, index, event.target.value))}
+                placeholder={index === 0 ? "Mis. Tiga rute bus malam mulai jalan pekan ini" : undefined}
+                aria-invalid={Boolean(errors[field])}
+                aria-describedby={describedBy(field, errors[field])}
+              />
+            </FormField>
+          ))}
+        </fieldset>
 
         <FormField id="body" label="Isi berita" hint={bodyHint(body)} error={errors.body}>
           <textarea
@@ -252,6 +301,47 @@ export function ArticleForm({ categories, canPublish, article }: ArticleFormProp
                 <li key={name}>{toHashtag(name)}</li>
               ))}
             </ul>
+          )}
+        </section>
+
+        <section className={styles.panel} aria-labelledby="panel-polling">
+          <h2 id="panel-polling" className={styles.panelTitle}>
+            Polling
+          </h2>
+          <FormField
+            id="pollQuestion"
+            label="Pertanyaan"
+            hint="Kosongkan bila berita ini tidak perlu polling."
+            error={errors.pollQuestion}
+            counter={{ current: pollQuestion.length, max: POLL_QUESTION_MAX }}
+          >
+            <input
+              id="pollQuestion"
+              name="pollQuestion"
+              value={pollQuestion}
+              onChange={(event) => setPollQuestion(event.target.value)}
+              placeholder="Mis. Kamu bakal naik bus malam?"
+              aria-invalid={Boolean(errors.pollQuestion)}
+              aria-describedby={describedBy("pollQuestion", errors.pollQuestion, true)}
+            />
+          </FormField>
+          <div className={styles.pollOptions} role="group" aria-label="Pilihan jawaban">
+            {POLL_OPTION_FIELDS.map((field, index) => (
+              <input
+                key={field}
+                name={field}
+                value={pollOptions[index]}
+                onChange={(event) => setPollOptions(updateAt(pollOptions, index, event.target.value))}
+                maxLength={POLL_OPTION_MAX}
+                placeholder={index < 2 ? `Pilihan ${index + 1}` : `Pilihan ${index + 1} (opsional)`}
+                aria-label={`Pilihan ${index + 1}`}
+                aria-invalid={Boolean(errors[field])}
+              />
+            ))}
+          </div>
+          {errorFor(POLL_OPTION_FIELDS) && <p className={styles.fieldError}>{errorFor(POLL_OPTION_FIELDS)}</p>}
+          {hasStoredPoll && (
+            <p className={styles.hint}>Mengubah pertanyaan atau pilihan akan mengosongkan suara yang sudah masuk.</p>
           )}
         </section>
 

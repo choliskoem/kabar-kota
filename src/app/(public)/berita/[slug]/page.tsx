@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { HighlightsBox } from "@/components/article/HighlightsBox";
 import { ListenToArticle } from "@/components/article/ListenToArticle";
+import { PollCard } from "@/components/article/PollCard";
 import { ReactionBar } from "@/components/article/ReactionBar";
 import { ReadingProgress } from "@/components/article/ReadingProgress";
 import { ShareButton } from "@/components/article/ShareButton";
@@ -11,12 +13,14 @@ import { StoryItem } from "@/components/news/StoryItem";
 import { routeStyle } from "@/components/news/route-style";
 import { formatDate, formatReadingTime, formatTime, splitParagraphs } from "@/lib/format";
 import { resolveCoverImage } from "@/lib/cover-image";
+import { emptyPollVotes } from "@/lib/polls";
 import { emptyReactionCounts } from "@/lib/reactions";
 import {
   getArticlesByCategory,
   getPublishedArticleBySlug,
   getRecentSlugs,
 } from "@/services/articles";
+import { getPollVotes } from "@/services/polls";
 import { getReactionCounts } from "@/services/reactions";
 import newsStyles from "@/components/news/news.module.css";
 import styles from "@/components/article/article.module.css";
@@ -57,10 +61,12 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   const article = await getPublishedArticleBySlug((await params).slug);
   if (!article) notFound();
 
-  const [sameCategory, reactionCounts] = await Promise.all([
+  const { poll } = article;
+  const [sameCategory, reactionCounts, pollVotes] = await Promise.all([
     getArticlesByCategory(article.category.id, RELATED_COUNT + 1),
-    // Reaksi bukan bagian inti berita: bila gagal dimuat, halaman tetap tampil dengan hitungan nol.
+    // Reaksi & polling bukan bagian inti berita: bila gagal dimuat, halaman tetap tampil dengan hitungan nol.
     getReactionCounts(article.id).catch(() => emptyReactionCounts()),
+    poll ? getPollVotes(poll).catch(() => emptyPollVotes(poll)) : null,
   ]);
   const related = sameCategory.filter(({ id }) => id !== article.id).slice(0, RELATED_COUNT);
   const path = `/berita/${article.slug}`;
@@ -94,6 +100,8 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           </div>
         </header>
 
+        <HighlightsBox highlights={article.highlights} />
+
         {cover && (
           <figure className={styles.figure}>
             <div className={styles.figureMedia}>
@@ -120,6 +128,8 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             </p>
           ))}
         </div>
+
+        {poll && pollVotes && <PollCard poll={poll} initialVotes={pollVotes} />}
 
         <ReactionBar articleId={article.id} initialCounts={reactionCounts} />
 

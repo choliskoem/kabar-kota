@@ -50,7 +50,30 @@ export interface ArticleSummaryRow {
   reading_minutes: number;
 }
 
-export interface ArticleRow extends ArticleSummaryRow {
+export interface HighlightRow {
+  position: number;
+  content: string;
+}
+
+export interface PollOptionRow {
+  id: number;
+  position: number;
+  label: string;
+}
+
+export interface PollRow {
+  id: string;
+  question: string;
+  options: PollOptionRow[];
+}
+
+export interface ArticleWithHighlightsRow extends ArticleSummaryRow {
+  highlights: HighlightRow[];
+}
+
+export interface ArticleRow extends ArticleWithHighlightsRow {
   body: string;
   tags: { tag: TagRow }[];
+  /** Relasi satu-ke-satu (polls.article_id unik): PostgREST mengirim objek atau null. */
+  poll: PollRow | null;
 }

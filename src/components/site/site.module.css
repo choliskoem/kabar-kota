@@ -234,3 +234,19 @@
 @keyframes logo-compact {
   to { font-size: 1.5rem; }
 }
+
+/* Tautan ke mode swipe: menonjol di antara kategori */
+.nav a.swipeLink {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--stabilo);
+}
+
+.nav a.swipeLink::before {
+  display: none;
+}
+
+.nav a.swipeLink:hover {
+  background: var(--ink);
+  color: var(--stabilo);
+}

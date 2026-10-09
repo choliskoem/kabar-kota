@@ -41,8 +41,11 @@ export async function renderShareCard({ title, label, color, details, routeColor
   // Label kecil di bawah selalu berlawanan dengan warna teks agar terbaca di latar apa pun.
   const pill = textColor === INK ? { background: INK, color: WHITE } : { background: WHITE, color: INK };
   const fonts = await loadShareCardFonts(`${siteConfig.name}${title}${label}${details.join("")}`);
-  const display = fonts.length > 0 ? "Display" : undefined;
-  const body = fonts.length > 0 ? "Body" : undefined;
+  // Bila font kustom gagal dimuat, properti fontFamily harus benar-benar tidak ada:
+  // nilai undefined membuat next/og error, sedangkan tanpa properti ia memakai font bawaan.
+  const hasCustomFonts = fonts.length > 0;
+  const displayFont = hasCustomFonts ? { fontFamily: "Display" } : {};
+  const bodyFont = hasCustomFonts ? { fontFamily: "Body" } : {};
 
   return new ImageResponse(
     (
@@ -56,7 +59,7 @@ export async function renderShareCard({ title, label, color, details, routeColor
           padding: "56px 64px",
           background: color,
           color: textColor,
-          fontFamily: body,
+          ...bodyFont,
         }}
       >
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
@@ -74,7 +77,7 @@ export async function renderShareCard({ title, label, color, details, routeColor
               transform: "rotate(-3deg)",
             }}
           >
-            <div style={{ fontFamily: display, fontSize: 56, fontWeight: 800, color: INK, lineHeight: 1 }}>
+            <div style={{ ...displayFont, fontSize: 56, fontWeight: 800, color: INK, lineHeight: 1 }}>
               {siteConfig.name}
             </div>
             <div
@@ -102,7 +105,7 @@ export async function renderShareCard({ title, label, color, details, routeColor
               background: WHITE,
               color: INK,
               boxShadow: `6px 6px 0 ${INK}`,
-              fontFamily: display,
+              ...displayFont,
               fontSize: 36,
               fontWeight: 800,
               transform: "rotate(2deg)",
@@ -116,7 +119,7 @@ export async function renderShareCard({ title, label, color, details, routeColor
           style={{
             display: "flex",
             maxWidth: 1060,
-            fontFamily: display,
+            ...displayFont,
             fontSize: titleFontSize(title),
             fontWeight: 800,
             lineHeight: 1,
@@ -145,6 +148,8 @@ export async function renderShareCard({ title, label, color, details, routeColor
         </div>
       </div>
     ),
-    { ...SHARE_CARD_SIZE, fonts },
+    // Tanpa font kustom, opsi fonts tidak dikirim sama sekali: daftar kosong justru
+    // mematikan font bawaan next/og dan membuat pembuatan gambar gagal.
+    hasCustomFonts ? { ...SHARE_CARD_SIZE, fonts } : SHARE_CARD_SIZE,
   );
 }
